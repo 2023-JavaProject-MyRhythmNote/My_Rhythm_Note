@@ -13,6 +13,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.RepaintManager;
 
 import javazoom.jl.player.MP3Player;
 
@@ -23,6 +24,15 @@ public class Game extends JFrame{
 	String imagePath = System.getProperty("user.dir")+"/src/images/";  //이미지 상대 경로
 	String musicPath = System.getProperty("user.dir")+"/src/musics/";  //음악 상대 경로
 	JPanel gamePanel = new JPanel();  //게임화면 패널
+	
+	//이펙트 바 이미지
+	Image EffectBar_S;
+	Image EffectBar_D;
+	Image EffectBar_F;
+	Image EffectBar_J;
+	Image EffectBar_K; 
+	Image EffectBar_L;
+	Image game_Screen = new ImageIcon(imagePath+"Game_Screen.png").getImage();
 	public Game() {
 		JLabel gameScreenLabel = new JLabel(new ImageIcon(imagePath+"Game_Screen.png"));  //게임화면 스크린
 		JLabel singer_title_Label;  //가수,제목 라벨
@@ -50,14 +60,16 @@ public class Game extends JFrame{
 		//add
 		gamePanel.add(singer_title_Label);  //가수,제목 라벨
 		gamePanel.add(gameScreenLabel);  //게임화면 라벨
+		addKeyListener(new NoteKeyListener());  //노트 키 리스너
 		
 		add(gamePanel);  //게임화면 패널
+		
 		
 		//기본 설정
 		setTitle("게임 화면");
 		setSize(FRAME_WIDTH, FRAME_HEIGHT);
 		setLocationRelativeTo(null);  //윈도우 창 정중앙에
-		setResizable(true);  //화면 크기 조정 불가
+		setResizable(false);  //화면 크기 조정 불가
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setVisible(true);
 	}
@@ -67,34 +79,136 @@ public class Game extends JFrame{
 	public void paint(Graphics g) {
 		super.paint(g);
 		Graphics2D g2 = (Graphics2D)g;
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);  //안티 앨리어싱 설정
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);  //안티 앨리어싱 설정(화질 좋아지게)
+		
+		//노트 이미지
 		Image noteS = new ImageIcon(imagePath+"Note_S.png").getImage();
 		Image noteD = new ImageIcon(imagePath+"Note_D.png").getImage();
 		Image noteF = new ImageIcon(imagePath+"Note_F.png").getImage();
 		Image noteJ = new ImageIcon(imagePath+"Note_J.png").getImage();
 		Image noteK = new ImageIcon(imagePath+"Note_K.png").getImage();
 		Image noteL = new ImageIcon(imagePath+"Note_L.png").getImage();
-		int imageX = 730;  //이미지 x위치
+		
+		int imageY = 730;  //이미지 y위치
 		Font font = new Font("TDTDTadakTadak",Font.PLAIN,90);  //폰트
 		g2.setFont(font);
 		g2.setColor(Color.WHITE);
+
+		//키보드 눌렀을때 효과
+		g2.drawImage(EffectBar_S, 80, 225, 200, 700,null);
+		g2.drawImage(EffectBar_D, 290, 220, 200, 700,null);
+		g2.drawImage(EffectBar_F, 500, 225, 200, 700,null);
+		g2.drawImage(EffectBar_J, 710, 217, 200, 700,null);
+		g2.drawImage(EffectBar_K, 920, 217, 200, 700,null);
+		g2.drawImage(EffectBar_L, 1130, 225, 200, 700,null);
 		
-		//노트 이미지
-		g2.drawImage(noteS, 70, imageX, 200, 130,null);
-		g2.drawImage(noteD, 290, imageX, 200, 130, null);
-		g2.drawImage(noteF, 510, imageX, 200, 130, null);
-		g2.drawImage(noteJ, 730, imageX, 200, 130, null);
-		g2.drawImage(noteK, 950, imageX, 200, 130, null);
-		g2.drawImage(noteL, 1170, imageX, 200, 130, null);
+		
+		//노트 이미지     이미지  x       y       가로  세로
+		g2.drawImage(noteS, 80, imageY, 200, 130,null);
+		g2.drawImage(noteD, 290, imageY, 200, 130, null);
+		g2.drawImage(noteF, 500, imageY, 200, 130, null);
+		g2.drawImage(noteJ, 710, imageY, 200, 130, null);
+		g2.drawImage(noteK, 920, imageY, 200, 130, null);
+		g2.drawImage(noteL, 1130, imageY, 200, 130, null);
+
 		//노트 알파벳
-		g2.drawString("S", 150, 820);
+		g2.drawString("S", 160, 820);
 		g2.drawString("D", 370, 820);
-		g2.drawString("F", 590, 820);
-		g2.drawString("J", 810, 820);
-		g2.drawString("K", 1030, 820);
-		g2.drawString("L", 1250, 820);
+		g2.drawString("F", 580, 820);
+		g2.drawString("J", 790, 820);
+		g2.drawString("K", 1000, 820);
+		g2.drawString("L", 1210, 820);
+
 		
 		g.dispose();
 		g2.dispose();
 	}
+	
+	//Pressed
+	public void pressed_S() {
+		EffectBar_S = new ImageIcon(imagePath+"EffectBar_S.png").getImage();
+	}
+	public void pressed_D() {
+		EffectBar_D = new ImageIcon(imagePath+"EffectBar_D.png").getImage();
+	}
+	public void pressed_F() {
+		EffectBar_F = new ImageIcon(imagePath+"EffectBar_F.png").getImage();
+	}
+	public void pressed_J() {
+		EffectBar_J = new ImageIcon(imagePath+"EffectBar_J.png").getImage();
+	}
+	public void pressed_K() {
+		EffectBar_K = new ImageIcon(imagePath+"EffectBar_K.png").getImage();
+	}
+	public void pressed_L() {
+		EffectBar_L = new ImageIcon(imagePath+"EffectBar_L.png").getImage();
+	}
+	
+	//Released
+	public void released_S() {
+		EffectBar_S = null;
+	}
+	public void released_D() {
+		EffectBar_D = null;
+	}
+	public void released_F() {
+		EffectBar_F = null;
+	}
+	public void released_J() {
+		EffectBar_J = null;
+	}
+	public void released_K() {
+		EffectBar_K  = null;
+	}
+	public void released_L() {
+		EffectBar_L = null;
+	}
+	
+	//일단은 내부 클래스로, 나중에 수정할 예정
+	class NoteKeyListener extends KeyAdapter{
+		@Override
+		public void keyPressed(KeyEvent e) {
+			if(e.getKeyChar() == 's') {
+				pressed_S();
+			}
+			if(e.getKeyChar() == 'd') {
+				pressed_D();
+			}
+			if(e.getKeyChar() == 'f') {
+				pressed_F();
+			}
+			if(e.getKeyChar() == 'j') {
+				pressed_J();
+			}
+			if(e.getKeyChar() == 'k') {
+				pressed_K();
+			}
+			if(e.getKeyChar() == 'l') {
+				pressed_L();
+			}
+			repaint();
+		}
+		public void keyReleased(KeyEvent e) {
+			if(e.getKeyChar() == 's') {
+				released_S();
+			}
+			if(e.getKeyChar() == 'd') {
+				released_D();
+			}
+			if(e.getKeyChar() == 'f') {
+				released_F();
+			}
+			if(e.getKeyChar() == 'j') {
+				released_J();
+			}
+			if(e.getKeyChar() == 'k') {
+				released_K();
+			}
+			if(e.getKeyChar() == 'l') {
+				released_L();
+			}
+			repaint();
+		}
+	}
+
 }
