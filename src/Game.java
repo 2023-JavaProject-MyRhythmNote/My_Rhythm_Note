@@ -25,6 +25,7 @@ public class Game extends JFrame{
 	String musicPath = System.getProperty("user.dir")+"/src/musics/";  //음악 상대 경로
 	JPanel gamePanel = new JPanel();  //게임화면 패널
 	
+	
 	//이펙트 바 이미지
 	Image EffectBar_S;
 	Image EffectBar_D;
@@ -33,6 +34,7 @@ public class Game extends JFrame{
 	Image EffectBar_K; 
 	Image EffectBar_L;
 	Image game_Screen = new ImageIcon(imagePath+"Game_Screen.png").getImage();
+	
 	public Game() {
 		JLabel gameScreenLabel = new JLabel(new ImageIcon(imagePath+"Game_Screen.png"));  //게임화면 스크린
 		JLabel singer_title_Label;  //가수,제목 라벨
@@ -66,7 +68,7 @@ public class Game extends JFrame{
 		
 		
 		//기본 설정
-		setTitle("게임 화면");
+		setTitle("My Rhythm Note");
 		setSize(FRAME_WIDTH, FRAME_HEIGHT);
 		setLocationRelativeTo(null);  //윈도우 창 정중앙에
 		setResizable(false);  //화면 크기 조정 불가
@@ -162,53 +164,6 @@ public class Game extends JFrame{
 	}
 	public void released_L() {
 		EffectBar_L = null;
-	}
-	
-	//일단은 내부 클래스로, 나중에 수정할 예정
-	class NoteKeyListener extends KeyAdapter{
-		@Override
-		public void keyPressed(KeyEvent e) {
-			if(e.getKeyChar() == 's') {
-				pressed_S();
-			}
-			if(e.getKeyChar() == 'd') {
-				pressed_D();
-			}
-			if(e.getKeyChar() == 'f') {
-				pressed_F();
-			}
-			if(e.getKeyChar() == 'j') {
-				pressed_J();
-			}
-			if(e.getKeyChar() == 'k') {
-				pressed_K();
-			}
-			if(e.getKeyChar() == 'l') {
-				pressed_L();
-			}
-			repaint();
-		}
-		public void keyReleased(KeyEvent e) {
-			if(e.getKeyChar() == 's') {
-				released_S();
-			}
-			if(e.getKeyChar() == 'd') {
-				released_D();
-			}
-			if(e.getKeyChar() == 'f') {
-				released_F();
-			}
-			if(e.getKeyChar() == 'j') {
-				released_J();
-			}
-			if(e.getKeyChar() == 'k') {
-				released_K();
-			}
-			if(e.getKeyChar() == 'l') {
-				released_L();
-			}
-			repaint();
-		}
 	}
 
 }

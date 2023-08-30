@@ -1,8 +1,9 @@
 
 public class Main {
-
+	public static Game game;
+	
 	public static void main(String[] args) {
-		new Game();  //테스트
+		game = new Game();
 	}
 }
      
