@@ -22,15 +22,15 @@ import javax.swing.Timer;
 
 import javazoom.jl.player.MP3Player;
 
-public class Game extends JFrame{
+public class Game extends Thread{
 	private final int FRAME_WIDTH = 1400;  //가로 크기
 	private final int FRAME_HEIGHT = 900;  //세로 크기
 	MP3Player mp3 = new MP3Player();  //노래 
 	String imagePath = System.getProperty("user.dir")+"/src/images/";  //이미지 상대 경로
 	String musicPath = System.getProperty("user.dir")+"/src/musics/";  //음악 상대 경로
 	JPanel gamePanel = new JPanel();  //게임화면 패널
-	Graphics2D gameScreen_g;  //더블 버퍼링을 위해
-	
+	Image game_Screen = new ImageIcon(imagePath+"Game_Screen.png").getImage();  //게임화면 이미지
+
 	//이펙트 바 이미지
 	Image EffectBar_S;
 	Image EffectBar_D;
@@ -38,103 +38,84 @@ public class Game extends JFrame{
 	Image EffectBar_J;
 	Image EffectBar_K; 
 	Image EffectBar_L;
-	Image game_Screen = new ImageIcon(imagePath+"Game_Screen.png").getImage();
+	public ArrayList<Note> noteList = new ArrayList<>();  //노트 arraylist
+	public NoteList notelist;  //주석 달기도 귀찮다...
+	Font font1 = new Font("TDTDTadakTadak",Font.PLAIN,150);  //노래 제목, 가수 폰트
+	Font font2 = new Font("TDTDTadakTadak",Font.PLAIN,90);  //노트 폰트
+
+	//노트 이미지
+	Image noteS = new ImageIcon(imagePath+"Note_S.png").getImage();
+	Image noteD = new ImageIcon(imagePath+"Note_D.png").getImage();
+	Image noteF = new ImageIcon(imagePath+"Note_F.png").getImage();
+	Image noteJ = new ImageIcon(imagePath+"Note_J.png").getImage();
+	Image noteK = new ImageIcon(imagePath+"Note_K.png").getImage();
+	Image noteL = new ImageIcon(imagePath+"Note_L.png").getImage();
 	
 	public Game() {
-		JLabel gameScreenLabel = new JLabel(new ImageIcon(imagePath+"Game_Screen.png"));  //게임화면 스크린
-		JLabel singer_title_Label;  //가수,제목 라벨
-		Font font = new Font("TDTDTadakTadak",Font.PLAIN,150);  //폰트
-		
 		Music.music = new Music("NewJeans", "ETA"); //테스트
+		start();
 //		mp3.play(musicPath+Music.music.getTitle()+".mp3");  //노래 재생 시작
-		
-		//set
-		gamePanel.setLayout(null);
-		singer_title_Label = new JLabel(Music.music.getSinger() + " - " + Music.music.getTitle());  //가수,제목 라벨
-		singer_title_Label.setHorizontalAlignment(JLabel.CENTER);  //중앙 정렬
-		
-		//Font
-		singer_title_Label.setFont(font);  //가수,제목 라벨
-		
-		//color
-		singer_title_Label.setForeground(Color.WHITE);  //가수,제목 라벨
-		
-		//setBounds
-		gameScreenLabel.setBounds(0, 0, FRAME_WIDTH, FRAME_HEIGHT);  //게임화면 라벨
-		singer_title_Label.setBounds(0, -20, FRAME_WIDTH, 250);   //가수,제목 라벨
-		
-		//add
-		gamePanel.add(singer_title_Label);  //가수,제목 라벨
-		gamePanel.add(gameScreenLabel);  //게임화면 라벨
-		addKeyListener(new NoteKeyListener());  //노트 키 리스너
-		
-		add(gamePanel);  //게임화면 패널
-        
-		//기본 설정
-		setTitle("My Rhythm Note");
-		setSize(FRAME_WIDTH, FRAME_HEIGHT);
-		setLocationRelativeTo(null);  //윈도우 창 정중앙에
-		setResizable(false);  //화면 크기 조정 불가
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		setVisible(true);
 	}
 	
-	@Override
-	public void paint(Graphics g) {
-		Image gameImg = createImage(getWidth(),getHeight());
-		gameScreen_g = (Graphics2D) gameImg.getGraphics();
-		drawScreen(gameScreen_g);
-		g.drawImage(gameImg, 0, 0, null);  //마지막에 이미지를 추가
-	}
 	
 	//키보드 노트?
 	public void drawScreen(Graphics2D g) {
-		paintComponents(gameScreen_g);	
-		gameScreen_g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);  //안티 앨리어싱 설정(화질 좋아지게)
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);  //안티 앨리어싱 설정(화질 좋아지게)
+		
+		g.setColor(Color.WHITE);  //글자 색 설정
+		
+		g.drawImage(game_Screen,0, 0, FRAME_WIDTH, FRAME_HEIGHT,null);  //게임화면 이미지
+		
+		g.setFont(font1);  //노래 가수, 제목 폰트 설정
+		g.drawString(Music.music.getSinger() + " - " + Music.music.getTitle(), 250, 160);  //노래 가수, 제목
+		g.setFont(font2);  //노트 폰트 설정
 		
 		//노트 이미지
-		Image noteS = new ImageIcon(imagePath+"Note_S.png").getImage();
-		Image noteD = new ImageIcon(imagePath+"Note_D.png").getImage();
-		Image noteF = new ImageIcon(imagePath+"Note_F.png").getImage();
-		Image noteJ = new ImageIcon(imagePath+"Note_J.png").getImage();
-		Image noteK = new ImageIcon(imagePath+"Note_K.png").getImage();
-		Image noteL = new ImageIcon(imagePath+"Note_L.png").getImage();
+		g.drawImage(noteS, 80, 730, 200, 130,null);
+		g.drawImage(noteD, 290, 730, 200, 130, null);
+		g.drawImage(noteF, 500, 730, 200, 130, null);
+		g.drawImage(noteJ, 710, 730, 200, 130, null);
+		g.drawImage(noteK, 920, 730, 200, 130, null);
+		g.drawImage(noteL, 1130, 730, 200, 130, null);
 		
-		int imageY = 730;  //이미지 y위치
-		Font font = new Font("TDTDTadakTadak",Font.PLAIN,90);  //폰트
-		
-		gameScreen_g.setFont(font);  //폰트 설정
-		gameScreen_g.setColor(Color.WHITE);  //글자 색 설정
-		
-
-		//노트 이미지
-		gameScreen_g.drawImage(noteS, 80, imageY, 200, 130,null);
-		gameScreen_g.drawImage(noteD, 290, imageY, 200, 130, null);
-		gameScreen_g.drawImage(noteF, 500, imageY, 200, 130, null);
-		gameScreen_g.drawImage(noteJ, 710, imageY, 200, 130, null);
-		gameScreen_g.drawImage(noteK, 920, imageY, 200, 130, null);
-		gameScreen_g.drawImage(noteL, 1130, imageY, 200, 130, null);
-
 		//노트 알파벳
-		gameScreen_g.drawString("S", 160, 820);
-		gameScreen_g.drawString("D", 370, 820);
-		gameScreen_g.drawString("F", 580, 820);
-		gameScreen_g.drawString("J", 790, 820);
-		gameScreen_g.drawString("K", 1000, 820);
-		gameScreen_g.drawString("L", 1210, 820);
+		g.drawString("S", 160, 820);
+		g.drawString("D", 370, 820);
+		g.drawString("F", 580, 820);
+		g.drawString("J", 790, 820);
+		g.drawString("K", 1000, 820);
+		g.drawString("L", 1210, 820);
+		
+		//흰색 노트
+		for(int i = 0; i<noteList.size(); i++) {
+			Note note = noteList.get(i);
+			note.drawNote(g);
+		}
 		
 		//키보드 눌렀을때 효과
-		gameScreen_g.drawImage(EffectBar_S, 80, 225, 200, 700,null);
-		gameScreen_g.drawImage(EffectBar_D, 290, 225, 200, 700,null);
-		gameScreen_g.drawImage(EffectBar_F, 500, 225, 200, 700,null);
-		gameScreen_g.drawImage(EffectBar_J, 710, 217, 200, 700,null);
-		gameScreen_g.drawImage(EffectBar_K, 920, 217, 200, 700,null);
-		gameScreen_g.drawImage(EffectBar_L, 1130, 225, 200, 700,null);
+		g.drawImage(EffectBar_S, 80, 200, 200, 700,null);
+		g.drawImage(EffectBar_D, 290, 195, 200, 700,null);
+		g.drawImage(EffectBar_F, 500, 195, 200, 700,null);
+		g.drawImage(EffectBar_J, 710, 190, 200, 710,null);
+		g.drawImage(EffectBar_K, 920, 185, 200, 710,null);
+		g.drawImage(EffectBar_L, 1130, 195, 200, 700,null);
 		
 		g.dispose();
-		gameScreen_g.dispose();
+		
+	}//drawScreen()
+	
+	//노트를 내려오게 하는 메서드
+	public void dropNote() {
+		notelist = new NoteList("S", 10);
+		Note note = new Note(notelist.getNoteType());
+		note.start();
+		noteList.add(note);
 	}
 	
+	@Override
+	public void run() {
+		dropNote();
+	}
 	
 	//Pressed
 	public void pressed_S() {
