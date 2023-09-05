@@ -38,8 +38,10 @@ public class Game extends Thread{
 	Image EffectBar_J;
 	Image EffectBar_K; 
 	Image EffectBar_L;
+	
 	public ArrayList<Note> noteList = new ArrayList<>();  //노트 arraylist
-	public NoteList notelist;  //주석 달기도 귀찮다...
+	public NoteList notelist;  //주석 달기도 귀찮다... 나도 모른
+	
 	Font font1 = new Font("TDTDTadakTadak",Font.PLAIN,150);  //노래 제목, 가수 폰트
 	Font font2 = new Font("TDTDTadakTadak",Font.PLAIN,90);  //노트 폰트
 
@@ -106,8 +108,8 @@ public class Game extends Thread{
 	
 	//노트를 내려오게 하는 메서드
 	public void dropNote() {
-		notelist = new NoteList("S", 10);
-		Note note = new Note(notelist.getNoteType());
+		notelist = new NoteList("S", 1000);
+		Note note = new Note(notelist);
 		note.start();
 		noteList.add(note);
 	}
