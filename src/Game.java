@@ -39,8 +39,7 @@ public class Game extends Thread{
 	Image EffectBar_K; 
 	Image EffectBar_L;
 	
-	public ArrayList<Note> noteList = new ArrayList<>();  //노트 arraylist
-	public NoteList notelist;  //주석 달기도 귀찮다... 나도 모른
+	public ArrayList<Note> noteArrayList = new ArrayList<>();  //노트를 담는 arraylist
 	
 	Font font1 = new Font("TDTDTadakTadak",Font.PLAIN,150);  //노래 제목, 가수 폰트
 	Font font2 = new Font("TDTDTadakTadak",Font.PLAIN,90);  //노트 폰트
@@ -55,7 +54,7 @@ public class Game extends Thread{
 	
 	public Game() {
 		Music.music = new Music("NewJeans", "ETA"); //테스트
-		start();
+		start();  //노트 내려오기 시작
 //		mp3.play(musicPath+Music.music.getTitle()+".mp3");  //노래 재생 시작
 	}
 	
@@ -89,8 +88,8 @@ public class Game extends Thread{
 		g.drawString("L", 1210, 820);
 		
 		//흰색 노트
-		for(int i = 0; i<noteList.size(); i++) {
-			Note note = noteList.get(i);
+		for(int i = 0; i<noteArrayList.size(); i++) {
+			Note note = noteArrayList.get(i);
 			note.drawNote(g);
 		}
 		
@@ -108,10 +107,12 @@ public class Game extends Thread{
 	
 	//노트를 내려오게 하는 메서드
 	public void dropNote() {
-		notelist = new NoteList("S", 1000);
-		Note note = new Note(notelist);
-		note.start();
-		noteList.add(note);
+		NoteList[] notelist = {new NoteList("S", 2000), new NoteList("F", 2500),new NoteList("D",3000),new NoteList("K",3000)};  //test
+		for (NoteList item : notelist) {
+		    Note note = new Note(item);
+		    note.start();
+		    noteArrayList.add(note);
+		}
 	}
 	
 	@Override
@@ -119,24 +120,39 @@ public class Game extends Thread{
 		dropNote();
 	}
 	
+	public void removeNote(String noteType) {  //노트 삭제 메서드
+	    for (int i = 0; i < noteArrayList.size(); i++) {
+	        Note note = noteArrayList.get(i);
+	        if (note.getNoteType().equals(noteType)) {
+	            noteArrayList.remove(i);
+	            i--; // 노트를 제거했으니 인덱스를 하나 줄임
+	        }
+	    }
+	}
 	//Pressed
 	public void pressed_S() {
 		EffectBar_S = new ImageIcon(imagePath+"EffectBar_S.png").getImage();
+		removeNote("S");
 	}
 	public void pressed_D() {
 		EffectBar_D = new ImageIcon(imagePath+"EffectBar_D.png").getImage();
+		removeNote("D");
 	}
 	public void pressed_F() {
 		EffectBar_F = new ImageIcon(imagePath+"EffectBar_F.png").getImage();
+		removeNote("F");
 	}
 	public void pressed_J() {
 		EffectBar_J = new ImageIcon(imagePath+"EffectBar_J.png").getImage();
+		removeNote("J");
 	}
 	public void pressed_K() {
 		EffectBar_K = new ImageIcon(imagePath+"EffectBar_K.png").getImage();
+		removeNote("K");
 	}
 	public void pressed_L() {
 		EffectBar_L = new ImageIcon(imagePath+"EffectBar_L.png").getImage();
+		removeNote("L");
 	}
 	
 	//Released

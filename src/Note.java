@@ -42,6 +42,10 @@ public class Note extends Thread{
 		
 	}
 	
+	public String getNoteType() {
+		return noteType;
+	}
+
 	//노트를 그래픽에 그림
 	public void drawNote(Graphics2D g){
 		g.setClip(0, 200, 1400, 800);  //노트를 그리는 구역 설정
@@ -57,8 +61,8 @@ public class Note extends Thread{
 				this.y += 10;
 				Thread.sleep(10);
 			}//while
-		} catch (InterruptedException e1) {
-			e1.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 		//test
 	}
