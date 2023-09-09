@@ -31,6 +31,7 @@ public class Game extends Thread{
 	JPanel gamePanel = new JPanel();  //게임화면 패널
 	Image game_Screen = new ImageIcon(imagePath+"Game_Screen.png").getImage();  //게임화면 이미지
 	int combo;  //콤보
+	int bestCombo;  //최고 콤보
 	int score;  //점수
 	
 	//이펙트 바 이미지
@@ -45,7 +46,8 @@ public class Game extends Thread{
 	
 	Font font1 = new Font("TDTDTadakTadak",Font.PLAIN,150);  //노래 제목, 가수 폰트
 	Font font2 = new Font("TDTDTadakTadak",Font.PLAIN,90);  //노트 폰트
-
+	Font font3 = new Font("TDTDTadakTadak",Font.PLAIN,40);  //점수 폰트
+	
 	//노트 이미지
 	Image noteS = new ImageIcon(imagePath+"Note_S.png").getImage();
 	Image noteD = new ImageIcon(imagePath+"Note_D.png").getImage();
@@ -65,7 +67,7 @@ public class Game extends Thread{
 		Music.music = new Music("NewJeans", "ETA"); //테스트
 		start();  //노트 내려오기 시작
 		
-		//노트 판정 효과 나오는 
+		//노트 판정 효과 나오는 시간 조절
 	    judgmentTimer = new Timer(100, new ActionListener() {
 	        @Override
 	        public void actionPerformed(ActionEvent e) {
@@ -89,7 +91,6 @@ public class Game extends Thread{
 		
 		g.setFont(font1);  //노래 가수, 제목 폰트 설정
 		g.drawString(Music.music.getSinger() + " - " + Music.music.getTitle(), 250, 160);  //노래 가수, 제목
-		g.setFont(font2);  //노트 폰트 설정
 		
 		//노트 이미지
 		g.drawImage(noteS, 80, 730, 200, 130,null);
@@ -99,6 +100,7 @@ public class Game extends Thread{
 		g.drawImage(noteK, 920, 730, 200, 130, null);
 		g.drawImage(noteL, 1130, 730, 200, 130, null);
 		
+		g.setFont(font2);  //노트 폰트 설정
 		//노트 알파벳
 		g.drawString("S", 160, 820);
 		g.drawString("D", 370, 820);
@@ -107,13 +109,20 @@ public class Game extends Thread{
 		g.drawString("K", 1000, 820);
 		g.drawString("L", 1210, 820);
 		
+		g.setFont(font3);
+		g.setColor(Color.YELLOW);
+		g.drawString("SCORE : "+score, 1100, 250);  //스코어
+		g.drawString("COMBO : " + combo,1100, 300);  //콤보
+		if(combo>bestCombo) bestCombo = combo;  //최고 콤보 수 
+		
 		//흰색 노트
 		for(int i = 0; i<noteArrayList.size(); i++) {
 			Note note = noteArrayList.get(i);
 			note.drawNote(g);
 		}
 
-	    missNote(820);
+	    missNote(820);  //노트의 y 좌표가 820을 넘어가면 삭제되도록 함
+	    
 		//키보드 눌렀을때 효과
 		g.drawImage(EffectBar_S, 80, 200, 200, 700,null);
 		g.drawImage(EffectBar_D, 290, 195, 200, 700,null);
@@ -133,8 +142,8 @@ public class Game extends Thread{
 	//노트를 내려오게 하는 메서드
 	public void dropNote() {
 		NoteList[] notelist = {
-				new NoteList("S", 2000),new NoteList("F",2500)
-				,new NoteList("D",4000),new NoteList("J",4500),new NoteList("K",5000)
+				new NoteList("S", 2000),new NoteList("D",2200)
+				,new NoteList("F",2300),new NoteList("J",2400),new NoteList("K",2500)
 				,new NoteList("F",5500),new NoteList("D",6000),new NoteList("S",7000)
 				,new NoteList("L",8000),new NoteList("D",9000),new NoteList("L",10000)
 		};  //test
@@ -161,14 +170,17 @@ public class Game extends Thread{
 		        //perfect
 		        if (note.getY() >=720 && note.getY() <=740 && note.getNoteType().equals(noteType)) {
 		        	perfect = new ImageIcon(imagePath+"Perfect.png").getImage();
-		        	score += 1000;
+		        	score += 1000;  //1000점 증가
+		        	combo++;
 		        }//good
 		        else if (note.getY() >=700 && note.getY() <=750 && note.getNoteType().equals(noteType)) {
 		        	good = new ImageIcon(imagePath+"Good.png").getImage();
-		        	score += 800;
+		        	score += 800;  //800점 증가
+		        	combo++;
 		        }//bad
 		        else if (note.getY() < 700 || note.getY() >740 && note.getNoteType().equals(noteType)) {
 		        	bad = new ImageIcon(imagePath+"Bad.png").getImage();
+		        	combo = 0;  //콤보 수 초기화
 		        }
 		        noteArrayList.remove(i);
 		        judgmentTimer.restart();
@@ -185,10 +197,13 @@ public class Game extends Thread{
 	        	bad = new ImageIcon(imagePath+"Bad.png").getImage();
 	        	judgmentTimer.restart();
 	            noteArrayList.remove(i);
+	            
+	            combo = 0; //콤보 수 초기화
 	            i--; // 노트를 제거했으므로 인덱스를 하나 줄임
 	        }
 	    }
 	}
+	
 	//Pressed
 	public void pressed_S() {
 		EffectBar_S = new ImageIcon(imagePath+"EffectBar_S.png").getImage();
