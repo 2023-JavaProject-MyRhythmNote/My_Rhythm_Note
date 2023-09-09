@@ -30,7 +30,9 @@ public class Game extends Thread{
 	String musicPath = System.getProperty("user.dir")+"/src/musics/";  //음악 상대 경로
 	JPanel gamePanel = new JPanel();  //게임화면 패널
 	Image game_Screen = new ImageIcon(imagePath+"Game_Screen.png").getImage();  //게임화면 이미지
-
+	int combo;  //콤보
+	int score;  //점수
+	
 	//이펙트 바 이미지
 	Image EffectBar_S;
 	Image EffectBar_D;
@@ -52,9 +54,27 @@ public class Game extends Thread{
 	Image noteK = new ImageIcon(imagePath+"Note_K.png").getImage();
 	Image noteL = new ImageIcon(imagePath+"Note_L.png").getImage();
 	
+	Timer judgmentTimer; // 타이머 변수
+	
+	//판정 이미지
+	Image perfect;
+	Image good;
+	Image bad;
+	
 	public Game() {
 		Music.music = new Music("NewJeans", "ETA"); //테스트
 		start();  //노트 내려오기 시작
+		
+		//노트 판정 효과 나오는 
+	    judgmentTimer = new Timer(100, new ActionListener() {
+	        @Override
+	        public void actionPerformed(ActionEvent e) {
+	            perfect = null;
+	            good = null;
+	            bad = null;
+	        }
+	    });
+	    judgmentTimer.setRepeats(false); // 타이머가 한 번만 실행되도록 설정
 //		mp3.play(musicPath+Music.music.getTitle()+".mp3");  //노래 재생 시작
 	}
 	
@@ -92,7 +112,8 @@ public class Game extends Thread{
 			Note note = noteArrayList.get(i);
 			note.drawNote(g);
 		}
-		
+
+	    missNote(820);
 		//키보드 눌렀을때 효과
 		g.drawImage(EffectBar_S, 80, 200, 200, 700,null);
 		g.drawImage(EffectBar_D, 290, 195, 200, 700,null);
@@ -101,13 +122,23 @@ public class Game extends Thread{
 		g.drawImage(EffectBar_K, 920, 185, 200, 710,null);
 		g.drawImage(EffectBar_L, 1130, 195, 200, 700,null);
 		
+		//판정 이미지
+		g.drawImage(perfect,550,200,300,200,null);
+		g.drawImage(good,550,210,300,150,null);
+		g.drawImage(bad,550,190,300,180,null);
 		g.dispose();
 		
 	}//drawScreen()
 	
 	//노트를 내려오게 하는 메서드
 	public void dropNote() {
-		NoteList[] notelist = {new NoteList("S", 2000), new NoteList("F", 2500),new NoteList("D",3000),new NoteList("K",3000)};  //test
+		NoteList[] notelist = {
+				new NoteList("S", 2000),new NoteList("F",2500)
+				,new NoteList("D",4000),new NoteList("J",4500),new NoteList("K",5000)
+				,new NoteList("F",5500),new NoteList("D",6000),new NoteList("S",7000)
+				,new NoteList("L",8000),new NoteList("D",9000),new NoteList("L",10000)
+		};  //test
+		
 		for (NoteList item : notelist) {
 		    Note note = new Note(item);
 		    note.start();
@@ -120,44 +151,68 @@ public class Game extends Thread{
 		dropNote();
 	}
 	
-	public void removeNote(String noteType) {  //노트 삭제 메서드
-	    for (int i = 0; i < noteArrayList.size(); i++) {
-	        Note note = noteArrayList.get(i);
-	        //노트가 화면에 나오고, 타입이 같다면 제거
-	        if (note.getY() >=120 &&note.getNoteType().equals(noteType)) {
-	            noteArrayList.remove(i);
-	            System.out.println(noteType + "제거");  //test
+	//노트 제거, 판정 메서드
+	public void Judge(String noteType) {
+		for (int i = 0; i < noteArrayList.size(); i++) {
+			Note note = noteArrayList.get(i);
+			//노트 제거
+			if (note.getY() >=120 &&note.getNoteType().equals(noteType)) {
+				//노트 판정
+		        //perfect
+		        if (note.getY() >=720 && note.getY() <=740 && note.getNoteType().equals(noteType)) {
+		        	perfect = new ImageIcon(imagePath+"Perfect.png").getImage();
+		        	score += 1000;
+		        }//good
+		        else if (note.getY() >=700 && note.getY() <=750 && note.getNoteType().equals(noteType)) {
+		        	good = new ImageIcon(imagePath+"Good.png").getImage();
+		        	score += 800;
+		        }//bad
+		        else if (note.getY() < 700 || note.getY() >740 && note.getNoteType().equals(noteType)) {
+		        	bad = new ImageIcon(imagePath+"Bad.png").getImage();
+		        }
+		        noteArrayList.remove(i);
+		        judgmentTimer.restart();
+	            
 	            i--; // 노트를 제거했으니 인덱스를 하나 줄임
 	        }
 	    }
 	}
-	public void Judge(String type) {
-		
+	
+	public void missNote(int missY) {  //miss 노트 객체 삭제 메서드
+	    for (int i = 0; i < noteArrayList.size(); i++) {
+	        Note note = noteArrayList.get(i);
+	        if (note.getY() >= missY) {
+	        	bad = new ImageIcon(imagePath+"Bad.png").getImage();
+	        	judgmentTimer.restart();
+	            noteArrayList.remove(i);
+	            i--; // 노트를 제거했으므로 인덱스를 하나 줄임
+	        }
+	    }
 	}
 	//Pressed
 	public void pressed_S() {
 		EffectBar_S = new ImageIcon(imagePath+"EffectBar_S.png").getImage();
-		removeNote("S");
+		Judge("S");
 	}
 	public void pressed_D() {
 		EffectBar_D = new ImageIcon(imagePath+"EffectBar_D.png").getImage();
-		removeNote("D");
+		Judge("D");
 	}
 	public void pressed_F() {
 		EffectBar_F = new ImageIcon(imagePath+"EffectBar_F.png").getImage();
-		removeNote("F");
+		Judge("F");
 	}
 	public void pressed_J() {
 		EffectBar_J = new ImageIcon(imagePath+"EffectBar_J.png").getImage();
-		removeNote("J");
+		Judge("J");
 	}
 	public void pressed_K() {
 		EffectBar_K = new ImageIcon(imagePath+"EffectBar_K.png").getImage();
-		removeNote("K");
+		Judge("K");
 	}
 	public void pressed_L() {
 		EffectBar_L = new ImageIcon(imagePath+"EffectBar_L.png").getImage();
-		removeNote("L");
+		Judge("L");
 	}
 	
 	//Released
