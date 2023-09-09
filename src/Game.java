@@ -123,11 +123,16 @@ public class Game extends Thread{
 	public void removeNote(String noteType) {  //노트 삭제 메서드
 	    for (int i = 0; i < noteArrayList.size(); i++) {
 	        Note note = noteArrayList.get(i);
-	        if (note.getNoteType().equals(noteType)) {
+	        //노트가 화면에 나오고, 타입이 같다면 제거
+	        if (note.getY() >=120 &&note.getNoteType().equals(noteType)) {
 	            noteArrayList.remove(i);
+	            System.out.println(noteType + "제거");  //test
 	            i--; // 노트를 제거했으니 인덱스를 하나 줄임
 	        }
 	    }
+	}
+	public void Judge(String type) {
+		
 	}
 	//Pressed
 	public void pressed_S() {
