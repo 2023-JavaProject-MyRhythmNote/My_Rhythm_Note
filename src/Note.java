@@ -41,7 +41,9 @@ public class Note extends Thread{
 		}
 		
 	}
-	
+	public int getY() {
+		return y;
+	}
 	public String getNoteType() {
 		return noteType;
 	}
