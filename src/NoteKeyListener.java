@@ -3,7 +3,7 @@ import java.awt.event.KeyEvent;
 
 	public class NoteKeyListener extends KeyAdapter{
 		
-		@Override
+		@Override  //키보드 눌렀을때 
 		public void keyPressed(KeyEvent e) {
 			if(e.getKeyChar() == 's') {
 				MyRhyThmNote.game.pressed_S();
@@ -24,7 +24,7 @@ import java.awt.event.KeyEvent;
 				MyRhyThmNote.game.pressed_L();
 			}
 		}
-		
+		//눌렀던 키보드를 뗐을때
 		public void keyReleased(KeyEvent e) {
 			if(e.getKeyChar() == 's') {
 				MyRhyThmNote.game.released_S();

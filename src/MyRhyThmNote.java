@@ -16,11 +16,11 @@ public class MyRhyThmNote extends JFrame {
 	boolean isGame = true;  //게임 스크린이냐?
 	
 	public MyRhyThmNote() {
-		game = new Game();
-		addKeyListener(new NoteKeyListener());
+		game = new Game();  //게임화면 실행 test
+		addKeyListener(new NoteKeyListener());  //키 리스너 추가
 		//기본 설정
-		setTitle("My Rhythm Note");
-		setSize(FRAME_WIDTH, FRAME_HEIGHT);
+		setTitle("My Rhythm Note");  //제목 설정
+		setSize(FRAME_WIDTH, FRAME_HEIGHT);  //사이즈 설정
 		setLocationRelativeTo(null);  //윈도우 창 정중앙에
 		setResizable(false);  //화면 크기 조정 불가
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -29,19 +29,20 @@ public class MyRhyThmNote extends JFrame {
 
 	@Override
 	public void paint(Graphics g) {
-		gameImg = createImage(FRAME_WIDTH,FRAME_HEIGHT);
-		gameGraphics = (Graphics2D) gameImg.getGraphics();
+		gameImg = createImage(FRAME_WIDTH,FRAME_HEIGHT);  //더블 버퍼링용 이미지 생성
+		gameGraphics = (Graphics2D) gameImg.getGraphics();  //게임 그래픽에 생성
 		gameGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);  //안티 앨리어싱 설정(화질 좋아지게)
-		screenDraw(gameGraphics);
+		screenDraw(gameGraphics);  //화면 그리기
 		g.drawImage(gameImg, 0, 0, null);  //마지막에 이미지를 추가
-		repaint();
+		repaint();  //계속 리페인트 해줌
 		g.dispose();
 	}
 	
 	
 	void screenDraw(Graphics2D g){  //화면 그리는 메서드
-		if(isGame) {
-			game.drawScreen(gameGraphics);
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);  //안티 앨리어싱 설정(화질 좋아지게)
+		if(isGame) {  //지금 게임 실행이면?
+			game.drawScreen(gameGraphics);  //게임 화면 나옴
 		}
 	}
 }
