@@ -1,5 +1,6 @@
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.RenderingHints;
 import java.awt.Shape;
 
 import javax.swing.ImageIcon;
@@ -41,6 +42,8 @@ public class Note extends Thread{
 		}
 		
 	}
+	
+	//getter
 	public int getY() {
 		return y;
 	}
@@ -50,7 +53,8 @@ public class Note extends Thread{
 
 	//노트를 그래픽에 그림
 	public void drawNote(Graphics2D g){
-		g.setClip(0, 200, 1400, 800);  //노트를 그리는 구역 설정
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);  //안티 앨리어싱 설정(화질 좋아지게)
+		g.setClip(0, 200, 1400, 800);  //노트가 나오는 구역 설정
 		g.drawImage(noteImage, this.x, this.y,200,130,null);  //그래픽에 노트 그려줌
 	}
 	
@@ -60,8 +64,8 @@ public class Note extends Thread{
 		try {
 			Thread.sleep(startTime);  //노트가 startTime이 지나고 등장함
 			while(true) {
-				this.y += 10;
-				Thread.sleep(10);
+				this.y += 10;  //y좌표를 10씩 계속 증가시킴
+				Thread.sleep(10); 
 			}//while
 		} catch (InterruptedException e) {
 			e.printStackTrace();

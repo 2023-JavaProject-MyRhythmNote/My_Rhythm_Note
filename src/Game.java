@@ -42,11 +42,11 @@ public class Game extends Thread{
 	Image EffectBar_K; 
 	Image EffectBar_L;
 	
-	public ArrayList<Note> noteArrayList = new ArrayList<>();  //노트를 담는 arraylist
+	public ArrayList<Note> noteArrayList = new ArrayList<>();  //노트를 담는 arrayList
 	
 	Font font1 = new Font("TDTDTadakTadak",Font.PLAIN,150);  //노래 제목, 가수 폰트
 	Font font2 = new Font("TDTDTadakTadak",Font.PLAIN,90);  //노트 폰트
-	Font font3 = new Font("TDTDTadakTadak",Font.PLAIN,40);  //점수 폰트
+	Font font3 = new Font("TDTDTadakTadak",Font.PLAIN,40);  //점수,콤보 폰트
 	
 	//노트 이미지
 	Image noteS = new ImageIcon(imagePath+"Note_S.png").getImage();
@@ -56,7 +56,7 @@ public class Game extends Thread{
 	Image noteK = new ImageIcon(imagePath+"Note_K.png").getImage();
 	Image noteL = new ImageIcon(imagePath+"Note_L.png").getImage();
 	
-	Timer judgmentTimer; // 타이머 변수
+	Timer judgmentTimer; //노트 판정 효과 타이머
 	
 	//판정 이미지
 	Image perfect;
@@ -65,10 +65,10 @@ public class Game extends Thread{
 	
 	public Game() {
 		Music.music = new Music("NewJeans", "ETA"); //테스트
-		start();  //노트 내려오기 시작
+		start();  //게임 시작
 		
 		//노트 판정 효과 나오는 시간 조절
-	    judgmentTimer = new Timer(100, new ActionListener() {
+	    judgmentTimer = new Timer(80, new ActionListener() {
 	        @Override
 	        public void actionPerformed(ActionEvent e) {
 	            perfect = null;
@@ -101,6 +101,7 @@ public class Game extends Thread{
 		g.drawImage(noteL, 1130, 730, 200, 130, null);
 		
 		g.setFont(font2);  //노트 폰트 설정
+		
 		//노트 알파벳
 		g.drawString("S", 160, 820);
 		g.drawString("D", 370, 820);
@@ -109,8 +110,9 @@ public class Game extends Thread{
 		g.drawString("K", 1000, 820);
 		g.drawString("L", 1210, 820);
 		
-		g.setFont(font3);
-		g.setColor(Color.YELLOW);
+		g.setFont(font3);  //크기 좀 작게 변경
+		g.setColor(Color.YELLOW);  //노란색으로 변경
+		
 		g.drawString("SCORE : "+score, 1100, 250);  //스코어
 		g.drawString("COMBO : " + combo,1100, 300);  //콤보
 		if(combo>bestCombo) bestCombo = combo;  //최고 콤보 수 
@@ -135,29 +137,30 @@ public class Game extends Thread{
 		g.drawImage(perfect,550,200,300,200,null);
 		g.drawImage(good,550,210,300,150,null);
 		g.drawImage(bad,550,190,300,180,null);
+		
 		g.dispose();
 		
 	}//drawScreen()
 	
 	//노트를 내려오게 하는 메서드
 	public void dropNote() {
-		NoteList[] notelist = {
-				new NoteList("S", 2000),new NoteList("D",2200)
-				,new NoteList("F",2300),new NoteList("J",2400),new NoteList("K",2500)
-				,new NoteList("F",5500),new NoteList("D",6000),new NoteList("S",7000)
+		NoteList[] notelist = {  //노트 리스트에서 노트 찍기
+				new NoteList("S", 2000),new NoteList("S",2500)
+				,new NoteList("F",4000),new NoteList("J",3500),new NoteList("K",3500)
+				,new NoteList("F",5000),new NoteList("D",6000),new NoteList("S",7000)
 				,new NoteList("L",8000),new NoteList("D",9000),new NoteList("L",10000)
 		};  //test
 		
 		for (NoteList item : notelist) {
-		    Note note = new Note(item);
-		    note.start();
-		    noteArrayList.add(note);
+		    Note note = new Note(item);  //노트리스트 배열에서 하나씩 가지고 와서 넣음
+		    note.start();  //Note 클래스 스레드 시작
+		    noteArrayList.add(note);  //노트 arrayList에 추가
 		}
 	}
 	
 	@Override
 	public void run() {
-		dropNote();
+		dropNote();  //노트 내려오게 함
 	}
 	
 	//노트 제거, 판정 메서드
@@ -171,18 +174,18 @@ public class Game extends Thread{
 		        if (note.getY() >=720 && note.getY() <=740 && note.getNoteType().equals(noteType)) {
 		        	perfect = new ImageIcon(imagePath+"Perfect.png").getImage();
 		        	score += 1000;  //1000점 증가
-		        	combo++;
+		        	combo++;  //콤보 수 증가
 		        }//good
 		        else if (note.getY() >=700 && note.getY() <=750 && note.getNoteType().equals(noteType)) {
 		        	good = new ImageIcon(imagePath+"Good.png").getImage();
 		        	score += 800;  //800점 증가
-		        	combo++;
+		        	combo++;  //콤보 수 증가
 		        }//bad
 		        else if (note.getY() < 700 || note.getY() >740 && note.getNoteType().equals(noteType)) {
 		        	bad = new ImageIcon(imagePath+"Bad.png").getImage();
 		        	combo = 0;  //콤보 수 초기화
 		        }
-		        noteArrayList.remove(i);
+		        noteArrayList.remove(i);  //노트 arrayList에서 삭제
 		        judgmentTimer.restart();
 	            
 	            i--; // 노트를 제거했으니 인덱스를 하나 줄임
@@ -193,8 +196,8 @@ public class Game extends Thread{
 	public void missNote(int missY) {  //miss 노트 객체 삭제 메서드
 	    for (int i = 0; i < noteArrayList.size(); i++) {
 	        Note note = noteArrayList.get(i);
-	        if (note.getY() >= missY) {
-	        	bad = new ImageIcon(imagePath+"Bad.png").getImage();
+	        if (note.getY() >= missY) {  //미스 라인을 지나면
+	        	bad = new ImageIcon(imagePath+"Bad.png").getImage();  //배드 효과
 	        	judgmentTimer.restart();
 	            noteArrayList.remove(i);
 	            
