@@ -17,6 +17,9 @@ public class Note extends Thread{
 	String noteType;  //노트의 타입
 	int startTime;  //노트가 나오는 시간
 	
+	private static final int BPM = 150; // test Super Shy BPM 값 설정
+	private static final int PIXELS_PER_BEAT = (int)(900/(60.0 / BPM));  // 한 비트당 움직여야 할 거리 계산
+	
 	public Note(NoteList notelist) {
 		this.noteType = notelist.getNoteType();
 		this.startTime = notelist.getStartTime();
@@ -64,7 +67,7 @@ public class Note extends Thread{
 		try {
 			Thread.sleep(startTime);  //노트가 startTime이 지나고 등장함
 			while(true) {
-				this.y += 10;  //y좌표를 10씩 계속 증가시킴
+				this.y += 10;  //y좌표를 증가
 				Thread.sleep(10); 
 			}//while
 		} catch (InterruptedException e) {
