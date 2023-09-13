@@ -77,7 +77,7 @@ public class Game extends Thread{
 	        }
 	    });
 	    judgmentTimer.setRepeats(false); // 타이머가 한 번만 실행되도록 설정
-//		mp3.play(musicPath+Music.music.getTitle()+".mp3");  //노래 재생 시작
+		mp3.play(musicPath+Music.music.getTitle()+".mp3");  //노래 재생 시작
 	}
 	
 	
@@ -145,8 +145,8 @@ public class Game extends Thread{
 	//노트를 내려오게 하는 메서드
 	public void dropNote() {
 		NoteList[] notelist = {  //노트 리스트에서 노트 찍기
-				new NoteList("S", 2000),new NoteList("S",2500)
-				,new NoteList("F",4000),new NoteList("J",3500),new NoteList("K",3500)
+				new NoteList("S", 2200),new NoteList("S",2500)
+				,new NoteList("S",2800),new NoteList("D",3500),new NoteList("K",3500)
 				,new NoteList("F",5000),new NoteList("D",6000),new NoteList("S",7000)
 				,new NoteList("L",8000),new NoteList("D",9000),new NoteList("L",10000)
 		};  //test
@@ -181,15 +181,15 @@ public class Game extends Thread{
 		        	score += 800;  //800점 증가
 		        	combo++;  //콤보 수 증가
 		        }//bad
-		        else if (note.getY() < 700 || note.getY() >740 && note.getNoteType().equals(noteType)) {
+		        else if (note.getY() < 700 || note.getY() >750 && note.getNoteType().equals(noteType)) {
 		        	bad = new ImageIcon(imagePath+"Bad.png").getImage();
 		        	combo = 0;  //콤보 수 초기화
 		        }
 		        noteArrayList.remove(i);  //노트 arrayList에서 삭제
 		        judgmentTimer.restart();
-	            
 	            i--; // 노트를 제거했으니 인덱스를 하나 줄임
-	        }
+	            break;
+			}
 	    }
 	}
 	
