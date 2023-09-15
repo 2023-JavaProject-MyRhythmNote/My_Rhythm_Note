@@ -1,23 +1,14 @@
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
-import javax.swing.RepaintManager;
 import javax.swing.Timer;
 
 import javazoom.jl.player.MP3Player;
@@ -25,7 +16,8 @@ import javazoom.jl.player.MP3Player;
 public class Game extends Thread{
 	private final int FRAME_WIDTH = 1400;  //가로 크기
 	private final int FRAME_HEIGHT = 900;  //세로 크기
-	MP3Player mp3 = new MP3Player();  //노래 
+	MP3Player mp3 = new MP3Player();  //노래 재생
+	MP3Player key_mp3 = new MP3Player();  //test
 	String imagePath = System.getProperty("user.dir")+"/src/images/";  //이미지 상대 경로
 	String musicPath = System.getProperty("user.dir")+"/src/musics/";  //음악 상대 경로
 	JPanel gamePanel = new JPanel();  //게임화면 패널
@@ -64,11 +56,12 @@ public class Game extends Thread{
 	Image bad;
 	
 	public Game() {
-		Music.music = new Music("NewJeans", "ETA"); //테스트
+		Music.music = new Music("NewJeans","ETA");
+		mp3.play(musicPath+Music.music.getTitle()+".mp3");  //노래 재생 시작
 		start();  //게임 시작
 		
 		//노트 판정 효과 나오는 시간 조절
-	    judgmentTimer = new Timer(80, new ActionListener() {
+	    judgmentTimer = new Timer(70, new ActionListener() {
 	        @Override
 	        public void actionPerformed(ActionEvent e) {
 	            perfect = null;
@@ -77,11 +70,10 @@ public class Game extends Thread{
 	        }
 	    });
 	    judgmentTimer.setRepeats(false); // 타이머가 한 번만 실행되도록 설정
-		mp3.play(musicPath+Music.music.getTitle()+".mp3");  //노래 재생 시작
 	}
+
 	
-	
-	//키보드 노트?
+	//게임 화면 그리기
 	public void drawScreen(Graphics2D g) {
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);  //안티 앨리어싱 설정(화질 좋아지게)
 		
@@ -123,7 +115,7 @@ public class Game extends Thread{
 			note.drawNote(g);
 		}
 
-	    missNote(820);  //노트의 y 좌표가 820을 넘어가면 삭제되도록 함
+	    missNote(850);  //노트의 y 좌표가 820을 넘어가면 삭제되도록 함
 	    
 		//키보드 눌렀을때 효과
 		g.drawImage(EffectBar_S, 80, 200, 200, 700,null);
@@ -145,10 +137,12 @@ public class Game extends Thread{
 	//노트를 내려오게 하는 메서드
 	public void dropNote() {
 		NoteList[] notelist = {  //노트 리스트에서 노트 찍기
-				new NoteList("S", 2200),new NoteList("S",2500)
-				,new NoteList("S",2800),new NoteList("D",3500),new NoteList("K",3500)
-				,new NoteList("F",5000),new NoteList("D",6000),new NoteList("S",7000)
-				,new NoteList("L",8000),new NoteList("D",9000),new NoteList("L",10000)
+				new NoteList("S", 3000),new NoteList("S",3500)
+				,new NoteList("S",4000),new NoteList("D",4300),new NoteList("K",4800)
+				,new NoteList("F",5000),new NoteList("J",5500),new NoteList("S",6000)
+				,new NoteList("L",6500),new NoteList("D",7000),new NoteList("L",7500)
+				,new NoteList("D",8000),new NoteList("J",8500),new NoteList("L",9000)
+				,new NoteList("S",9500),new NoteList("F",10000),new NoteList("K",10500)
 		};  //test
 		
 		for (NoteList item : notelist) {
@@ -188,7 +182,8 @@ public class Game extends Thread{
 		        noteArrayList.remove(i);  //노트 arrayList에서 삭제
 		        judgmentTimer.restart();
 	            i--; // 노트를 제거했으니 인덱스를 하나 줄임
-	            break;
+	            
+	            break;  //노트 중복 삭제 안되도록 
 			}
 	    }
 	}

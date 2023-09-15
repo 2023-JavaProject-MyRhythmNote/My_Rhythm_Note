@@ -2,9 +2,9 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
 	public class NoteKeyListener extends KeyAdapter{
-		
 		@Override  //키보드 눌렀을때 
 		public void keyPressed(KeyEvent e) {
+			MyRhyThmNote.game.key_mp3.play(System.getProperty("user.dir")+"/src/musics/Key_Effect.mp3");
 			if(e.getKeyChar() == 's') {
 				MyRhyThmNote.game.pressed_S();
 			}
