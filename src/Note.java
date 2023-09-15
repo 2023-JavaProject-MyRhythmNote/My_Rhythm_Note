@@ -11,7 +11,6 @@ import com.mysql.cj.x.protobuf.MysqlxNotice.Frame;
 //노트가 내려오는 클래스
 public class Note extends Thread{
 	String imagePath = System.getProperty("user.dir")+"/src/images/";  //이미지 상대 경로
-	String musicPath = System.getProperty("user.dir")+"/src/musics/";  //음악 상대 경로
 	Image noteImage = new ImageIcon(imagePath+"Note.png").getImage();  //노트 이미지
 	int x, y = 100;  //노트의 x, y 위치
 	String noteType;  //노트의 타입
