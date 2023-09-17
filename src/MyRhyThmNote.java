@@ -16,8 +16,8 @@ public class MyRhyThmNote extends JFrame {
 	boolean isGame = true;  //게임 스크린이냐?
 	
 	public MyRhyThmNote() {
-		game = new Game();  //게임화면 실행 test
 		addKeyListener(new NoteKeyListener());  //키 리스너 추가
+		game = new Game();  //게임화면 실행 test
 		//기본 설정
 		setTitle("My Rhythm Note");  //제목 설정
 		setSize(FRAME_WIDTH, FRAME_HEIGHT);  //사이즈 설정

@@ -1,10 +1,13 @@
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
+import javazoom.jl.player.MP3Player;
+
 	public class NoteKeyListener extends KeyAdapter{
+//		MP3Player key_mp3 = new MP3Player();  //test
 		@Override  //키보드 눌렀을때 
 		public void keyPressed(KeyEvent e) {
-			MyRhyThmNote.game.key_mp3.play(System.getProperty("user.dir")+"/src/musics/Key_Effect.mp3");
+//			key_mp3.play(System.getProperty("user.dir")+"/src/musics/Key_Effect.mp3");
 			if(e.getKeyChar() == 's') {
 				MyRhyThmNote.game.pressed_S();
 			}

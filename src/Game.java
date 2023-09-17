@@ -5,6 +5,9 @@ import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
@@ -17,7 +20,6 @@ public class Game extends Thread{
 	private final int FRAME_WIDTH = 1400;  //가로 크기
 	private final int FRAME_HEIGHT = 900;  //세로 크기
 	MP3Player mp3 = new MP3Player();  //노래 재생
-	MP3Player key_mp3 = new MP3Player();  //test
 	String imagePath = System.getProperty("user.dir")+"/src/images/";  //이미지 상대 경로
 	String musicPath = System.getProperty("user.dir")+"/src/musics/";  //음악 상대 경로
 	JPanel gamePanel = new JPanel();  //게임화면 패널
@@ -25,6 +27,9 @@ public class Game extends Thread{
 	int combo;  //콤보
 	int bestCombo;  //최고 콤보
 	int score;  //점수
+	int countGood;  //굿 카운트
+	int countPerfect;  //퍼펙트 카운트
+	int countBad;  //배드 카운트
 	
 	//이펙트 바 이미지
 	Image EffectBar_S;
@@ -59,7 +64,6 @@ public class Game extends Thread{
 		Music.music = new Music("NewJeans","ETA");
 		mp3.play(musicPath+Music.music.getTitle()+".mp3");  //노래 재생 시작
 		start();  //게임 시작
-		
 		//노트 판정 효과 나오는 시간 조절
 	    judgmentTimer = new Timer(70, new ActionListener() {
 	        @Override
@@ -71,7 +75,6 @@ public class Game extends Thread{
 	    });
 	    judgmentTimer.setRepeats(false); // 타이머가 한 번만 실행되도록 설정
 	}
-
 	
 	//게임 화면 그리기
 	public void drawScreen(Graphics2D g) {
@@ -169,20 +172,21 @@ public class Game extends Thread{
 		        	perfect = new ImageIcon(imagePath+"Perfect.png").getImage();
 		        	score += 1000;  //1000점 증가
 		        	combo++;  //콤보 수 증가
+		        	countPerfect++;  //퍼펙트 수 증가
 		        }//good
 		        else if (note.getY() >=700 && note.getY() <=750 && note.getNoteType().equals(noteType)) {
 		        	good = new ImageIcon(imagePath+"Good.png").getImage();
 		        	score += 800;  //800점 증가
 		        	combo++;  //콤보 수 증가
+		        	countGood++;  //굿 수 증가
 		        }//bad
 		        else if (note.getY() < 700 || note.getY() >750 && note.getNoteType().equals(noteType)) {
 		        	bad = new ImageIcon(imagePath+"Bad.png").getImage();
 		        	combo = 0;  //콤보 수 초기화
+		        	countBad++;  //배드 수 증가
 		        }
 		        noteArrayList.remove(i);  //노트 arrayList에서 삭제
 		        judgmentTimer.restart();
-	            i--; // 노트를 제거했으니 인덱스를 하나 줄임
-	            
 	            break;  //노트 중복 삭제 안되도록 
 			}
 	    }
@@ -195,7 +199,7 @@ public class Game extends Thread{
 	        	bad = new ImageIcon(imagePath+"Bad.png").getImage();  //배드 효과
 	        	judgmentTimer.restart();
 	            noteArrayList.remove(i);
-	            
+	            countBad++;  //배드 수 증가
 	            combo = 0; //콤보 수 초기화
 	            i--; // 노트를 제거했으므로 인덱스를 하나 줄임
 	        }
