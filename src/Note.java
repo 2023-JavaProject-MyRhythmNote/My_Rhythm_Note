@@ -16,8 +16,8 @@ public class Note extends Thread{
 	String noteType;  //노트의 타입
 	int startTime;  //노트가 나오는 시간
 	
-	private static final int BPM = 150; // test Super Shy BPM 값 설정
-	private static final int PIXELS_PER_BEAT = (int)(900/(60.0 / BPM));  // 한 비트당 움직여야 할 거리 계산
+//	private static final int BPM = 150; // test Super Shy BPM 값 설정
+//	private static final int PIXELS_PER_BEAT = (int)(900/(60.0 / BPM));  // 한 비트당 움직여야 할 거리 계산
 	
 	public Note(NoteList notelist) {
 		this.noteType = notelist.getNoteType();
