@@ -1,6 +1,8 @@
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -24,14 +26,25 @@ public class Screen extends JFrame{
 	JLabel logoTextLabel1 = new JLabel("MY", JLabel.CENTER);  //로고 라벨1  "MY"
 	JLabel logoTextLabel2 = new JLabel("RHYTHM", JLabel.CENTER);  //로고 라벨2  "RHYTHM"
 	JLabel logoTextLabel3 = new JLabel("NOTE", JLabel.CENTER);  //로고 라벨3  "NOTE"
+	JLabel noPasswordLabel = new JLabel("<html><font color='red'>닉네임이나 비밀번호를 잘못 입력했어!</font></html>", JLabel.CENTER);  //불일치 안내 라벨
+	JLabel overlapNicknameLabel = new JLabel("<html><font color='red'>앗! 중복인 닉네임이야 다른 걸로 해줘~</font></html>", JLabel.CENTER);  //중복 안내 라벨
+	JLabel checkPasswordLabel = new JLabel("<html><font color='red'>앗! 비밀번호가 일치하지 않아~</font></html>", JLabel.CENTER);  //비번 불일치 안내 라벨
 	
 	JPanel startPanel = new JPanel();  //시작화면 패널
 	JPanel signInPanel = new JPanel();  //로그인 패널
 	JPanel signUpPanel = new JPanel();  //회원가입 패널
 	JPanel gameRulePanel = new JPanel();  //게임방법 패널
+
+	JTextField signInNicknameTF = new JTextField();  //로그인 닉네임 텍스트 필드
+	JTextField signInPasswordTF = new JTextField();  //로그인 비밀번호 텍스트 필드
+	JTextField signUpNicknameTF = new JTextField();  //회원가입 닉네임 텍스트 필드
+	JTextField signUpPasswordTF = new JTextField();  //회원가입 비밀번호 텍스트 필드
+	JTextField signUpPasswordCheckTF = new JTextField();  //회원가입 비밀번호 확인 텍스트 필드
 	
 	Font font1 = new Font("TDTDTadakTadak",Font.PLAIN,250);   //로고 폰트
 	Font buttonFont = new Font("TDTDTadakTadak",Font.PLAIN,80);   //버튼 폰트
+	
+	User user = new User();  //유저
 	
 	public Screen() {
 		/*setBounds*/
@@ -111,14 +124,11 @@ public class Screen extends JFrame{
 		JLabel nickNameText = new JLabel("닉네임 : ");  //닉네임 텍스트 라벨
 		JLabel passwordText = new JLabel("비밀번호 : ");  //비밀번호 텍스트 라벨
 		
-		JTextField nickNameTF = new JTextField();  //닉네임 텍스트 필드
-		JTextField passwordTF = new JTextField();  //비밀번호 텍스트 필드
-		
 		Font font = new Font("TDTDTadakTadak",Font.PLAIN,200);  //폰트
 		Font font2 = new Font("TDTDTadakTadak",Font.PLAIN,120);  // 조금 작은 폰트
 		Font textFont = new Font("TDTDTadakTadak",Font.PLAIN,60);  //텍스트 필드용 폰트
-		
-		JButton OKButton = new JButton("확인!",new ImageIcon(imagePath+"Button.png"));  //확인 버튼
+		Font guideFont = new Font("TDTDTadakTadak",Font.PLAIN,40);  //비번 불일치 안내 폰트
+		JButton OKButton = new JButton("로그인!",new ImageIcon(imagePath+"Button.png"));  //확인 버튼
 		
 		/*set*/
 		signInPanel.setLayout(null);  //로그인 화면 패널
@@ -134,29 +144,61 @@ public class Screen extends JFrame{
 		passwordText.setFont(font2);
 		passwordText.setBounds(105, 480, 600, 150);
 		//닉네임 텍스트 필드
-		nickNameTF.setFont(textFont);
-		nickNameTF.setBounds(600, 355, 300, 80);
+		signInNicknameTF.setFont(textFont);
+		signInNicknameTF.setBounds(600, 355, 300, 80);
 		//비밀번호 텍스트 필드
-		passwordTF.setFont(textFont);
-		passwordTF.setBounds(600, 515, 300, 80);
+		signInPasswordTF.setFont(textFont);
+		signInPasswordTF.setBounds(600, 515, 300, 80);
 		//확인버튼
 		OKButton.setFont(buttonFont);
 		OKButton.setBounds(540,700,320,75);
 		OKButton.setHorizontalTextPosition(JButton.CENTER);
 		OKButton.setRolloverIcon(clickButtonImg);  //호버링시 이미지 변경
 		transparencyButton(OKButton);  //버튼 투명하게
-		
+		//불일치 안내 라벨
+		noPasswordLabel.setFont(guideFont);
+		noPasswordLabel.setBounds(200, 600, 1000, 100);
+		noPasswordLabel.setVisible(false);
 		/*add*/
+		signInPanel.add(noPasswordLabel);  //불일치 안내 라벨
 		signInPanel.add(signInText);  //로그인 텍스트 라벨
 		signInPanel.add(nickNameText);  //닉네임 텍스트 라벨
 		signInPanel.add(passwordText);  //비번 텍스트 라벨
-		signInPanel.add(nickNameTF);  //닉네임 텍스트 필드
-		signInPanel.add(passwordTF);  //비번 텍스트 필드
+		signInPanel.add(signInNicknameTF);  //닉네임 텍스트 필드
+		signInPanel.add(signInPasswordTF);  //비번 텍스트 필드
+		
 		signInPanel.add(OKButton);  //확인 버튼
-		OKButton.addActionListener(buttonListener);  //test
+		OKButton.addActionListener(buttonListener);
 		signInPanel.add(signInScreenLabel);
 		add(signInPanel);
 		signInPanel.setVisible(false);
+	}
+	
+	//로그인 기능 메서드
+	public void doSignIn() {
+		DB db = new DB();
+		db.connect();  //db 연결
+		
+		user.setNickName(signInNicknameTF.getText());  //닉네임 설정
+		user.setPassword(signInPasswordTF.getText());  //비번 설정
+		
+		String sql = "SELECT * FROM user WHERE nickname = '" + user.getNickName() + "'";  //닉네임이 있는지 확인용 sql문
+		ResultSet result;
+		try {
+			result = db.stmt.executeQuery(sql);
+			if(result.next()) {  //닉네임이 있으면
+				if(user.getPassword().equals(result.getString("password"))){ //입력한 비번과 계정 비번이 일치하면 로그인 성공
+					//노래 선택 화면으로
+				}else {
+					noPasswordLabel.setVisible(true);  // 불일치 안내
+				}
+			}else {  //닉네임 없으면
+				noPasswordLabel.setVisible(true);  // 불일치 안내
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		db.closeConnection();  //db 연결 해제
 	}
 	
 	//버튼 액션리스너
@@ -177,10 +219,11 @@ public class Screen extends JFrame{
             	generateGameRule();  //게임방법 화면 생성
             	gameRulePanel.setVisible(true);  //게임방법 화면 보이게
             } 
-			if (e.getActionCommand().equals("확인!")) {
-            	signInPanel.setVisible(false);  //test
-            	signUpPanel.setVisible(false);  //test
-            	startPanel.setVisible(true);  //test
+			if (e.getActionCommand().equals("로그인!")) {
+        		doSignIn();
+            }
+			if (e.getActionCommand().equals("회원가입!")) {
+        		doSignUp();
             }
 			if (e.getActionCommand().equals("알겠어!")) {
             	gameRulePanel.setVisible(false);  //게임방법 화면 숨김
@@ -198,15 +241,12 @@ public class Screen extends JFrame{
 		JLabel passwordText = new JLabel("비밀번호 : ");  //비밀번호 텍스트 라벨
 		JLabel passwordCheckText = new JLabel("비밀번호 확인 : ");  //비밀번호 확인 텍스트 라벨
 		
-		JTextField nickNameTF = new JTextField();  //닉네임 텍스트 필드
-		JTextField passwordTF = new JTextField();  //비밀번호 텍스트 필드
-		JTextField passwordCheckTF = new JTextField();  //비밀번호 확인 텍스트 필드
-		
 		Font font = new Font("TDTDTadakTadak",Font.PLAIN,200);  //폰트
 		Font font2 = new Font("TDTDTadakTadak",Font.PLAIN,100);  // 조금 작은 폰트
 		Font textFont = new Font("TDTDTadakTadak",Font.PLAIN,60);  //텍스트 필드용 폰트
+		Font guideFont = new Font("TDTDTadakTadak",Font.PLAIN,40);  //불일치 안내 폰트
 		
-		JButton OKButton = new JButton("확인!",new ImageIcon(imagePath+"Button.png"));  //확인 버튼
+		JButton OKButton = new JButton("회원가입!",new ImageIcon(imagePath+"Button.png"));  //확인 버튼
 		
 		/*set*/
 		signUpPanel.setLayout(null);  //회원가입 화면 패널
@@ -225,34 +265,90 @@ public class Screen extends JFrame{
 		passwordCheckText.setFont(font2);
 		passwordCheckText.setBounds(105, 515, 600, 150);
 		//닉네임 텍스트 필드
-		nickNameTF.setFont(textFont);
-		nickNameTF.setBounds(700, 260, 300, 80);
+		signUpNicknameTF.setFont(textFont);
+		signUpNicknameTF.setBounds(700, 260, 300, 80);
 		//비밀번호 텍스트 필드
-		passwordTF.setFont(textFont);
-		passwordTF.setBounds(700, 405, 300, 80);
+		signUpPasswordTF.setFont(textFont);
+		signUpPasswordTF.setBounds(700, 405, 300, 80);
 		//비밀번호 확인 텍스트 필드
-		passwordCheckTF.setFont(textFont);
-		passwordCheckTF.setBounds(700, 550, 300, 80);
+		signUpPasswordCheckTF.setFont(textFont);
+		signUpPasswordCheckTF.setBounds(700, 550, 300, 80);
 		//확인버튼
 		OKButton.setFont(buttonFont);
 		OKButton.setBounds(540,700,320,75);
 		OKButton.setHorizontalTextPosition(JButton.CENTER);
 		OKButton.setRolloverIcon(clickButtonImg);  //호버링시 이미지 변경
 		transparencyButton(OKButton);  //버튼 투명하게
+		//중복 닉네임 안내 라벨
+		overlapNicknameLabel.setFont(guideFont);
+		overlapNicknameLabel.setBounds(200, 610, 1000, 100);
+		overlapNicknameLabel.setVisible(false);
+		//비번 불일치 안내 라벨
+		checkPasswordLabel.setFont(guideFont);
+		checkPasswordLabel.setBounds(200, 610, 1000, 100);
+		checkPasswordLabel.setVisible(false);
+		
 		/*add*/
 		signUpPanel.add(signUpText);  //로그인 텍스트 라벨
 		signUpPanel.add(nickNameText);  //닉네임 텍스트 라벨
 		signUpPanel.add(passwordText);  //비번 텍스트 라벨
 		signUpPanel.add(passwordCheckText);  //비번 확인 텍스트 라벨
-		signUpPanel.add(nickNameTF);  //닉네임 텍스트 필드
-		signUpPanel.add(passwordTF);  //비번 텍스트 필드
-		signUpPanel.add(passwordCheckTF);  //비번 확인 텍스트 필드
+		signUpPanel.add(signUpNicknameTF);  //닉네임 텍스트 필드
+		signUpPanel.add(signUpPasswordTF);  //비번 텍스트 필드
+		signUpPanel.add(signUpPasswordCheckTF);  //비번 확인 텍스트 필드
+		signUpPanel.add(overlapNicknameLabel);  //중복 닉네임 안내 라벨
+		signUpPanel.add(checkPasswordLabel);  //비번 불일치 안내 라벨
 		signUpPanel.add(OKButton);  //확인 버튼
-		OKButton.addActionListener(buttonListener);  //test
+		OKButton.addActionListener(buttonListener);
 		signUpPanel.add(signUpScreenLabel);
 		add(signUpPanel);
 		signUpPanel.setVisible(false);
 	}
+	
+	// 회원가입 기능 메서드
+	public void doSignUp() {
+		DB db = new DB();
+		db.connect(); // db 연결
+		boolean isOverlap = false;  //닉네임이 중복인가
+		
+		user.setNickName(signUpNicknameTF.getText()); // 닉네임 설정
+		user.setPassword(signUpPasswordTF.getText()); // 비번 설정
+		
+		//중복 닉네임인지 확인 
+		String sql = "SELECT * FROM user WHERE nickname = '"+user.getNickName()+"'";// 닉네임이 있는지 확인용 sql문
+		ResultSet checkResult;
+		try {
+			checkResult = db.stmt.executeQuery(sql);
+			if(checkResult.next()) {  //중복 닉네임이 있다면
+				checkPasswordLabel.setVisible(false);
+				overlapNicknameLabel.setVisible(true);  //중복 닉네임 안내
+				isOverlap = true;  //중복임
+			}else {  //중복되는 닉네임이 없다면
+				overlapNicknameLabel.setVisible(false);  //중복 닉네임 안내 숨김
+				isOverlap = false;  //중복아님
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		//비번과 확인용 비번이 불일치인지 확인
+		if(!signUpPasswordTF.getText().equals(signUpPasswordCheckTF.getText()) && !isOverlap) {  //비번과 확인용 비번이 불일치라면 & 닉네임이 중복이 아니라면
+			checkPasswordLabel.setVisible(true);   //중복 닉네임 안내
+		}else {  //일치하면
+			checkPasswordLabel.setVisible(false);  //중복 닉네임 안내 숨김
+		}
+		
+		//계정 정보 DB에 넣기
+		sql = "INSERT INTO user (nickname, password) VALUES ('"+user.getNickName()+"', '"+user.getPassword()+"')";  //데이터 넣는 sql문
+		try {
+			db.stmt.executeUpdate(sql);
+			//노래 선택 화면으로
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		db.closeConnection(); // db 연결 해제
+	}
+	
 	//게임방법 패널 만드는 메서드
 	private void generateGameRule() {
 		ImageIcon gameRuleImg = new ImageIcon(imagePath + "GameRule_Screen.png");  //게임방법 화면 이미지
