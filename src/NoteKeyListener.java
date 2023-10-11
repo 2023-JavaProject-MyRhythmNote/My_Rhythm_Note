@@ -7,45 +7,48 @@ import javazoom.jl.player.MP3Player;
 //		MP3Player key_mp3 = new MP3Player();  //test
 		@Override  //키보드 눌렀을때 
 		public void keyPressed(KeyEvent e) {
-//			key_mp3.play(System.getProperty("user.dir")+"/src/musics/Key_Effect.mp3");
+			if(Screen.game == null) return;
+			
 			if(e.getKeyChar() == 's') {
-				MyRhyThmNote.game.pressed_S();
+				Screen.game.pressed_S();
 			}
 			if(e.getKeyChar() == 'd') {
-				MyRhyThmNote.game.pressed_D();
+				Screen.game.pressed_D();
 			}
 			if(e.getKeyChar() == 'f') {
-				MyRhyThmNote.game.pressed_F();
+				Screen.game.pressed_F();
 			}
 			if(e.getKeyChar() == 'j') {
-				MyRhyThmNote.game.pressed_J();
+				Screen.game.pressed_J();
 			}
 			if(e.getKeyChar() == 'k') {
-				MyRhyThmNote.game.pressed_K();
+				Screen.game.pressed_K();
 			}
 			if(e.getKeyChar() == 'l') {
-				MyRhyThmNote.game.pressed_L();
+				Screen.game.pressed_L();
 			}
 		}
 		//눌렀던 키보드를 뗐을때
 		public void keyReleased(KeyEvent e) {
+			if(Screen.game == null) return;
+			
 			if(e.getKeyChar() == 's') {
-				MyRhyThmNote.game.released_S();
+				Screen.game.released_S();
 			}
 			if(e.getKeyChar() == 'd') {
-				MyRhyThmNote.game.released_D();
+				Screen.game.released_D();
 			}
 			if(e.getKeyChar() == 'f') {
-				MyRhyThmNote.game.released_F();
+				Screen.game.released_F();
 			}
 			if(e.getKeyChar() == 'j') {
-				MyRhyThmNote.game.released_J();
+				Screen.game.released_J();
 			}
 			if(e.getKeyChar() == 'k') {
-				MyRhyThmNote.game.released_K();
+				Screen.game.released_K();
 			}
 			if(e.getKeyChar() == 'l') {
-				MyRhyThmNote.game.released_L();
+				Screen.game.released_L();
 			}
 		}
 	}

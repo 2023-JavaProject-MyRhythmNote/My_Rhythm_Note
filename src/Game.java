@@ -161,7 +161,7 @@ public class Game extends Thread{
 		for (int i = 0; i < noteArrayList.size(); i++) {
 			Note note = noteArrayList.get(i);
 			//노트 제거
-			if (note.getY() >=120 &&note.getNoteType().equals(noteType)) {
+			if (note.getY() >=120 && note.getNoteType().equals(noteType)) {
 				//노트 판정
 		        //perfect
 		        if (note.getY() >=720 && note.getY() <=740 && note.getNoteType().equals(noteType)) {
