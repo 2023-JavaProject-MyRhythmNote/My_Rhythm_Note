@@ -18,6 +18,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
+import javazoom.jl.player.MP3Player;
+
 public class Screen extends JFrame{
 
 	public static Game game;
@@ -62,10 +64,11 @@ public class Screen extends JFrame{
 	
 	User user = new User();  //유저
 	ArrayList<Music> musicList = new ArrayList<Music>();  //노래 리스트
+	MP3Player highlightPlayer = new MP3Player();  //노래 하이라이트 재생용 MP3Player
 	
 	public Screen() {
 //		game = new Game();  //test
-		musicList.add(new Music("imase","Night DANCER"));  //나이트 댄서 추가
+		musicList.add(new Music("imase","NIGHT DANCER"));  //NIGHT DANCER 추가
 		musicList.add(new Music("정국","3D"));  //3D 추가
 		musicList.add(new Music("NewJeans","ETA"));  //ETA 추가  
 		
@@ -488,6 +491,8 @@ public class Screen extends JFrame{
 	
 	//노래 선택 패널 만드는 메서드
 	public void generateSelectSong() {
+		String musicPath = System.getProperty("user.dir")+"/src/musics/";  //음악 상대 경로
+		
 		ImageIcon selectSongImg = new ImageIcon(imagePath + "SelectSong_Screen.png");  //노래 선택 화면 이미지
 		ImageIcon clickRightButtonImg = new ImageIcon(imagePath + "Click_Right_Button.png");  //오른쪽 버튼 클릭 이미지
 		ImageIcon albumImg = new ImageIcon(imagePath + "Album_"+musicList.get(0).getTitle()+".png");  //노래 리스트에 있는 첫번째 노래 앨범 이미지
@@ -508,7 +513,9 @@ public class Screen extends JFrame{
 		Font font = new Font("TDTDTadakTadak",Font.PLAIN,80);   //화면 폰트
 		Font titleFont = new Font("TDTDTadakTadak",Font.PLAIN,75);  //제목 폰트
 		Font singerFont = new Font("TDTDTadakTadak",Font.PLAIN,60);  //가수 폰트
-		Integer a;
+		
+		highlightPlayer.play(musicPath+musicList.get(musicIndex).getTitle()+" highlight.mp3");  //노래 재생
+		
 		/*set*/
 		selectSongPanel.setLayout(null);
 		selectSongLabel.setBounds(0, 0, FRAME_WIDTH, FRAME_HEIGHT);  //노래 선택 화면 라벨
@@ -554,7 +561,7 @@ public class Screen extends JFrame{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if(e.getActionCommand().equals("오른쪽")) {
-					if(musicIndex<musicList.size())  //노래 리스트 길이보다 작다면 인덱스 증가
+					if(musicIndex<musicList.size()-1)  //노래 리스트 길이보다 작다면 인덱스 증가
 						musicIndex++;
 				}else if(e.getActionCommand().equals("왼쪽")) {
 					if(musicIndex>0)   //0보다 크다면 인덱스 감소
@@ -564,6 +571,19 @@ public class Screen extends JFrame{
 				titleLabel.setText(musicList.get(musicIndex).getTitle());  //노래 제목 교체
 				singerLabel.setText(musicList.get(musicIndex).getSinger());  //노래 가수 교체
 				albumLabel.setIcon(albumChangeImg);  //앨범 커버 이미지 교체
+
+				if(highlightPlayer.isPlaying()) {  //이전 노래가 재생중이라면
+					highlightPlayer.stop();  //노래 정지
+				}
+				
+				//노래가 끊기는 게 어색해서 넣음
+				try {
+					Thread.sleep(400);
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				highlightPlayer.play(musicPath+musicList.get(musicIndex).getTitle()+" highlight.mp3");  //하이라이트 재생
 			}
 		};
 		
