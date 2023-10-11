@@ -1,8 +1,14 @@
+import java.awt.Color;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -10,10 +16,19 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 
 public class Screen extends JFrame{
+
+	public static Game game;
+	Image screenImg;  //더블 버퍼링용 이미지
+	Graphics2D screenGraphics;  //더블 버퍼링용 그래픽
+	boolean isGame = false;  //게임 스크린이냐?
+	
 	private final int FRAME_WIDTH = 1400;  //가로 크기
 	private final int FRAME_HEIGHT = 900;  //세로 크기
+	int musicIndex = 0;  //이미지 인덱스
+	
 	String imagePath = System.getProperty("user.dir")+"/src/images/";  //이미지 상대 경로
 	ImageIcon startImg = new ImageIcon(imagePath + "Start_Screen.png"); //시작화면 이미지
 	ImageIcon clickButtonImg = new ImageIcon(imagePath + "Click_Button.png");  //버튼 클릭 이미지
@@ -34,7 +49,8 @@ public class Screen extends JFrame{
 	JPanel signInPanel = new JPanel();  //로그인 패널
 	JPanel signUpPanel = new JPanel();  //회원가입 패널
 	JPanel gameRulePanel = new JPanel();  //게임방법 패널
-
+	JPanel selectSongPanel = new JPanel();  //노래 선택 패널
+	
 	JTextField signInNicknameTF = new JTextField();  //로그인 닉네임 텍스트 필드
 	JTextField signInPasswordTF = new JTextField();  //로그인 비밀번호 텍스트 필드
 	JTextField signUpNicknameTF = new JTextField();  //회원가입 닉네임 텍스트 필드
@@ -45,10 +61,17 @@ public class Screen extends JFrame{
 	Font buttonFont = new Font("TDTDTadakTadak",Font.PLAIN,80);   //버튼 폰트
 	
 	User user = new User();  //유저
+	ArrayList<Music> musicList = new ArrayList<Music>();  //노래 리스트
 	
 	public Screen() {
-		/*setBounds*/
+//		game = new Game();  //test
+		musicList.add(new Music("imase","Night DANCER"));  //나이트 댄서 추가
+		musicList.add(new Music("정국","3D"));  //3D 추가
+		musicList.add(new Music("NewJeans","ETA"));  //ETA 추가  
+		
+		/*set*/
 		startPanel.setLayout(null);   //시작화면
+		setFocusable(true);
 		//로그인 버튼
 		signInButton.setBounds(540,650,320,75);
 		signInButton.setFont(buttonFont);
@@ -86,6 +109,7 @@ public class Screen extends JFrame{
 		transparencyButton(gameRuleButton);
 		
 		/*add*/
+		addKeyListener(new NoteKeyListener());  //키 리스너 추가
 		signInButton.addActionListener(buttonListener);
 		signUpButton.addActionListener(buttonListener);
 		gameRuleButton.addActionListener(buttonListener);
@@ -95,7 +119,6 @@ public class Screen extends JFrame{
 		startPanel.add(logoTextLabel1);  //로고 라벨1
 		startPanel.add(logoTextLabel2);  //로고 라벨2
 		startPanel.add(logoTextLabel3);  //로고 라벨3
-		/* 얘네 위에 add 해야함*/
 		startPanel.add(startScreenLabel);  //시작화면 라벨
 		add(startPanel);  //시작화면 패널
 		
@@ -106,6 +129,27 @@ public class Screen extends JFrame{
 		setResizable(false);  //화면 크기 조정 불가
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setVisible(true);
+	}
+
+	@Override
+	public void paint(Graphics g) {
+		screenImg = createImage(FRAME_WIDTH,FRAME_HEIGHT);  //더블 버퍼링용 이미지 생성
+		screenGraphics = (Graphics2D) screenImg.getGraphics();  //게임 그래픽에 생성
+		screenGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);  //안티 앨리어싱 설정(화질 좋아지게)
+		screenDraw(screenGraphics);  //화면 그리기
+		g.drawImage(screenImg, 0, 0, null);  //마지막에 이미지를 추가
+		g.dispose();
+	}
+	
+	
+	void screenDraw(Graphics2D g){  //화면 그리는 메서드
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);  //안티 앨리어싱 설정(화질 좋아지게)
+		if(isGame) {  //지금 게임 실행이면?
+			game.drawScreen(g);  //게임 화면 나옴
+			repaint();
+		}else {  //게임 실행이 아니라면
+			paintComponents(g);
+		}
 	}
 	
 	//버튼 투명하게 만드는 메서드
@@ -178,17 +222,20 @@ public class Screen extends JFrame{
 	public void doSignIn() {
 		DB db = new DB();
 		db.connect();  //db 연결
+		boolean signInSuccess = false;  //로그인 성공했는지
 		
 		user.setNickName(signInNicknameTF.getText());  //닉네임 설정
 		user.setPassword(signInPasswordTF.getText());  //비번 설정
 		
 		String sql = "SELECT * FROM user WHERE nickname = '" + user.getNickName() + "'";  //닉네임이 있는지 확인용 sql문
 		ResultSet result;
+		
 		try {
 			result = db.stmt.executeQuery(sql);
 			if(result.next()) {  //닉네임이 있으면
 				if(user.getPassword().equals(result.getString("password"))){ //입력한 비번과 계정 비번이 일치하면 로그인 성공
-					//노래 선택 화면으로
+					noPasswordLabel.setVisible(false);  // 불일치 안내 숨김
+					signInSuccess = true;  //로그인 성공
 				}else {
 					noPasswordLabel.setVisible(true);  // 불일치 안내
 				}
@@ -199,6 +246,11 @@ public class Screen extends JFrame{
 			e.printStackTrace();
 		}
 		db.closeConnection();  //db 연결 해제
+		
+		if(signInSuccess) {
+			signInPanel.setVisible(false);  //로그인 화면 숨김
+			selectSongPanel.setVisible(true);  //노래 선택 화면 보이게
+		}
 	}
 	
 	//버튼 액션리스너
@@ -207,9 +259,12 @@ public class Screen extends JFrame{
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			startPanel.setVisible(false);  //시작화면 숨김
+			generateSelectSong();  //노래 선택 화면 생성 test
+			
 			if (e.getActionCommand().equals("로그인")) {
-				generateSignIn();  //로그인 화면 생성
-				signInPanel.setVisible(true);  //로그인 화면 보이게
+				selectSongPanel.setVisible(true);  //test
+//				generateSignIn();  //로그인 화면 생성
+//				signInPanel.setVisible(true);  //로그인 화면 보이게
             }
 			if (e.getActionCommand().equals("회원가입")) {
                generateSignUp();  //회원가입 화면 생성
@@ -220,10 +275,10 @@ public class Screen extends JFrame{
             	gameRulePanel.setVisible(true);  //게임방법 화면 보이게
             } 
 			if (e.getActionCommand().equals("로그인!")) {
-        		doSignIn();
+        		doSignIn();  //로그인 기능
             }
 			if (e.getActionCommand().equals("회원가입!")) {
-        		doSignUp();
+        		doSignUp();  //회원가입 기능
             }
 			if (e.getActionCommand().equals("알겠어!")) {
             	gameRulePanel.setVisible(false);  //게임방법 화면 숨김
@@ -310,6 +365,7 @@ public class Screen extends JFrame{
 		DB db = new DB();
 		db.connect(); // db 연결
 		boolean isOverlap = false;  //닉네임이 중복인가
+		boolean signUpSuccess = false;  //회원가입 성공했는지
 		
 		user.setNickName(signUpNicknameTF.getText()); // 닉네임 설정
 		user.setPassword(signUpPasswordTF.getText()); // 비번 설정
@@ -317,6 +373,7 @@ public class Screen extends JFrame{
 		//중복 닉네임인지 확인 
 		String sql = "SELECT * FROM user WHERE nickname = '"+user.getNickName()+"'";// 닉네임이 있는지 확인용 sql문
 		ResultSet checkResult;
+		
 		try {
 			checkResult = db.stmt.executeQuery(sql);
 			if(checkResult.next()) {  //중복 닉네임이 있다면
@@ -342,11 +399,16 @@ public class Screen extends JFrame{
 		sql = "INSERT INTO user (nickname, password) VALUES ('"+user.getNickName()+"', '"+user.getPassword()+"')";  //데이터 넣는 sql문
 		try {
 			db.stmt.executeUpdate(sql);
-			//노래 선택 화면으로
+			signUpSuccess = true;  //회원가입 성공
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		db.closeConnection(); // db 연결 해제
+		
+		if(signUpSuccess) {
+			signUpPanel.setVisible(false);  //회원가입 화면 숨김
+			selectSongPanel.setVisible(true);  //노래 선택 화면 보이게
+		}
 	}
 	
 	//게임방법 패널 만드는 메서드
@@ -422,5 +484,103 @@ public class Screen extends JFrame{
 		gameRulePanel.add(gameRuleScreenLabel);  //게임방법 화면 라벨
 		add(gameRulePanel);
 		gameRulePanel.setVisible(false);
+	}
+	
+	//노래 선택 패널 만드는 메서드
+	public void generateSelectSong() {
+		ImageIcon selectSongImg = new ImageIcon(imagePath + "SelectSong_Screen.png");  //노래 선택 화면 이미지
+		ImageIcon clickRightButtonImg = new ImageIcon(imagePath + "Click_Right_Button.png");  //오른쪽 버튼 클릭 이미지
+		ImageIcon albumImg = new ImageIcon(imagePath + "Album_"+musicList.get(0).getTitle()+".png");  //노래 리스트에 있는 첫번째 노래 앨범 이미지
+		ImageIcon clickLeftButtonImg = new ImageIcon(imagePath + "Click_Left_Button.png");  //왼쪽 버튼 클릭 이미지
+		ImageIcon clickRankingButtonImg = new ImageIcon(imagePath + "Click_Ranking_Button.png");  //랭킹보기 버튼 클릭 이미지
+		
+		JLabel selectSongLabel = new JLabel(selectSongImg);  //노래 선택 화면 라벨
+		JLabel albumLabel = new JLabel(albumImg);  //앨범 커버 라벨
+		JLabel screenNameLabel = new JLabel("노래 선택");  //노래 선택 글자 라벨
+		JLabel titleLabel = new JLabel(musicList.get(0).getTitle());  //노래 리스트에 있는 첫번째 노래 제목 가져옴
+		JLabel singerLabel = new JLabel(musicList.get(0).getSinger());  //노래 리스트에 있는 첫번째 노래 가수 가져옴
+		
+		JButton rightButton = new JButton(new ImageIcon(imagePath + "Right_Button.png"));  //오른쪽 버튼
+		JButton leftButton = new JButton(new ImageIcon(imagePath + "Left_Button.png"));  //왼쪽 버튼
+		JButton selectButton = new JButton("선택!", new ImageIcon(imagePath + "Button.png"));  //선택 버튼
+		JButton rankingButton = new JButton("랭킹보기",new ImageIcon(imagePath + "Ranking_Button.png"));  //랭킹보기 버튼
+		
+		Font font = new Font("TDTDTadakTadak",Font.PLAIN,80);   //화면 폰트
+		Font titleFont = new Font("TDTDTadakTadak",Font.PLAIN,75);  //제목 폰트
+		Font singerFont = new Font("TDTDTadakTadak",Font.PLAIN,60);  //가수 폰트
+		Integer a;
+		/*set*/
+		selectSongPanel.setLayout(null);
+		selectSongLabel.setBounds(0, 0, FRAME_WIDTH, FRAME_HEIGHT);  //노래 선택 화면 라벨
+		//노래 제목
+		titleLabel.setBounds(0,0,1400,100);
+		titleLabel.setHorizontalAlignment(JLabel.CENTER);  //중앙 정렬
+		titleLabel.setFont(titleFont);  //폰트 설정
+		//노래 가수
+		singerLabel.setBounds(0,80,1400,100);
+		singerLabel.setHorizontalAlignment(JLabel.CENTER);  //중앙 정렬
+		singerLabel.setFont(singerFont);  //폰트 설정
+		//노래 선택 글자 라벨
+		screenNameLabel.setBounds(75,0,300,100);
+		screenNameLabel.setFont(font);  //폰트 설정
+		//오른쪽 버튼
+		rightButton.setBounds(1050, 400, 270, 130);
+		transparencyButton(rightButton);  //버튼 투명하게
+		rightButton.setRolloverIcon(clickRightButtonImg);  //호버링시 이미지 변경
+		rightButton.setActionCommand("오른쪽");
+		//왼쪽 버튼
+		leftButton.setBounds(100, 400, 270, 130);
+		transparencyButton(leftButton);  //버튼 투명하게
+		leftButton.setRolloverIcon(clickLeftButtonImg);  //호버링시 이미지 변경
+		leftButton.setActionCommand("왼쪽");
+		//앨범 커버
+		albumLabel.setBounds(0, 0, FRAME_WIDTH, FRAME_HEIGHT);  //앨범 커버 라벨
+		//선택 버튼
+		selectButton.setBounds(540,700,320,100);
+		transparencyButton(selectButton);  //버튼 투명하게
+		selectButton.setFont(buttonFont);  //폰트 설정
+		selectButton.setHorizontalTextPosition(JButton.CENTER);
+		selectButton.setRolloverIcon(clickButtonImg);  //호버링시 이미지 변경
+		//랭킹보기 버튼
+		rankingButton.setBounds(1050,0,320,80);
+		transparencyButton(rankingButton);  //버튼 투명하게
+		rankingButton.setFont(buttonFont);  //폰트 설정
+		rankingButton.setHorizontalTextPosition(JButton.CENTER);
+		rankingButton.setRolloverIcon(clickRankingButtonImg);  //호버링시 이미지 변경
+		
+		//액션 리스너
+		ActionListener buttonListener = new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(e.getActionCommand().equals("오른쪽")) {
+					if(musicIndex<musicList.size())  //노래 리스트 길이보다 작다면 인덱스 증가
+						musicIndex++;
+				}else if(e.getActionCommand().equals("왼쪽")) {
+					if(musicIndex>0)   //0보다 크다면 인덱스 감소
+						musicIndex--;
+				}
+				ImageIcon albumChangeImg = new ImageIcon(imagePath + "Album_"+ musicList.get(musicIndex).getTitle()+".png");  //앨범 커버 이미지
+				titleLabel.setText(musicList.get(musicIndex).getTitle());  //노래 제목 교체
+				singerLabel.setText(musicList.get(musicIndex).getSinger());  //노래 가수 교체
+				albumLabel.setIcon(albumChangeImg);  //앨범 커버 이미지 교체
+			}
+		};
+		
+		/*add*/
+		rightButton.addActionListener(buttonListener);  //버튼 액션 리스너
+		leftButton.addActionListener(buttonListener);  //버튼 액션 리스너
+		rankingButton.addActionListener(buttonListener);  //버튼 액션 리스너
+		selectSongPanel.add(screenNameLabel);  //노래 선택 라벨
+		selectSongPanel.add(titleLabel);  //제목 라벨
+		selectSongPanel.add(singerLabel);  //가수 라벨
+		selectSongPanel.add(selectButton);  //선택 버튼
+		selectSongPanel.add(rightButton);  //오른쪽 버튼
+		selectSongPanel.add(leftButton);  //왼쪽 버튼
+		selectSongPanel.add(rankingButton);  //랭킹보기 버튼
+		selectSongPanel.add(albumLabel);  //앨범 커버 라벨
+		selectSongPanel.add(selectSongLabel);  //노래 선택 화면 라벨
+		add(selectSongPanel);
+		selectSongPanel.setVisible(false);
 	}
 }
