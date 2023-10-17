@@ -1,5 +1,6 @@
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -21,7 +22,6 @@ import javax.swing.SwingConstants;
 import javazoom.jl.player.MP3Player;
 
 public class Screen extends JFrame{
-
 	public static Game game;
 	Image screenImg;  //더블 버퍼링용 이미지
 	Graphics2D screenGraphics;  //더블 버퍼링용 그래픽
@@ -29,7 +29,7 @@ public class Screen extends JFrame{
 	
 	private final int FRAME_WIDTH = 1400;  //가로 크기
 	private final int FRAME_HEIGHT = 900;  //세로 크기
-	int musicIndex = 0;  //이미지 인덱스
+	int musicIndex = 0;  //앨범 이미지 인덱스
 	
 	String imagePath = System.getProperty("user.dir")+"/src/images/";  //이미지 상대 경로
 	ImageIcon startImg = new ImageIcon(imagePath + "Start_Screen.png"); //시작화면 이미지
@@ -52,6 +52,7 @@ public class Screen extends JFrame{
 	JPanel signUpPanel = new JPanel();  //회원가입 패널
 	JPanel gameRulePanel = new JPanel();  //게임방법 패널
 	JPanel selectSongPanel = new JPanel();  //노래 선택 패널
+	JPanel rankingPanel = new JPanel();  //랭킹 패널
 	
 	JTextField signInNicknameTF = new JTextField();  //로그인 닉네임 텍스트 필드
 	JTextField signInPasswordTF = new JTextField();  //로그인 비밀번호 텍스트 필드
@@ -252,6 +253,7 @@ public class Screen extends JFrame{
 		
 		if(signInSuccess) {
 			signInPanel.setVisible(false);  //로그인 화면 숨김
+			generateSelectSong();  //노래 선택 화면 생성
 			selectSongPanel.setVisible(true);  //노래 선택 화면 보이게
 		}
 	}
@@ -262,12 +264,10 @@ public class Screen extends JFrame{
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			startPanel.setVisible(false);  //시작화면 숨김
-			generateSelectSong();  //노래 선택 화면 생성 test
 			
 			if (e.getActionCommand().equals("로그인")) {
-				selectSongPanel.setVisible(true);  //test
-//				generateSignIn();  //로그인 화면 생성
-//				signInPanel.setVisible(true);  //로그인 화면 보이게
+				generateSignIn();  //로그인 화면 생성
+				signInPanel.setVisible(true);  //로그인 화면 보이게
             }
 			if (e.getActionCommand().equals("회원가입")) {
                generateSignUp();  //회원가입 화면 생성
@@ -287,6 +287,10 @@ public class Screen extends JFrame{
             	gameRulePanel.setVisible(false);  //게임방법 화면 숨김
             	startPanel.setVisible(true);  //시작화면 보이게
             }
+			if(e.getActionCommand().equals("돌아가기")) {
+				rankingPanel.removeAll();  //랭킹 화면 지워버림
+				selectSongPanel.setVisible(true);    //노래 선택 화면 보이게
+			}
 		}
 	};
 	
@@ -408,8 +412,9 @@ public class Screen extends JFrame{
 		}
 		db.closeConnection(); // db 연결 해제
 		
-		if(signUpSuccess) {
+		if(signUpSuccess) {  //회원가입 성공시
 			signUpPanel.setVisible(false);  //회원가입 화면 숨김
+			generateSelectSong();  //노래 선택 화면 생성
 			selectSongPanel.setVisible(true);  //노래 선택 화면 보이게
 		}
 	}
@@ -552,11 +557,12 @@ public class Screen extends JFrame{
 		rankingButton.setBounds(1050,0,320,80);
 		transparencyButton(rankingButton);  //버튼 투명하게
 		rankingButton.setFont(buttonFont);  //폰트 설정
+		rankingButton.setActionCommand("랭킹보기");
 		rankingButton.setHorizontalTextPosition(JButton.CENTER);
 		rankingButton.setRolloverIcon(clickRankingButtonImg);  //호버링시 이미지 변경
 		
 		//액션 리스너
-		ActionListener buttonListener = new ActionListener() {
+		ActionListener selelctbuttonListener = new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -566,6 +572,11 @@ public class Screen extends JFrame{
 				}else if(e.getActionCommand().equals("왼쪽")) {
 					if(musicIndex>0)   //0보다 크다면 인덱스 감소
 						musicIndex--;
+				}
+				if(e.getActionCommand().equals("랭킹보기")) {
+					selectSongPanel.setVisible(false);  //노래 선택 화면 숨김
+					generateRanking(musicIndex);  //랭킹 화면 생성 메서드
+					rankingPanel.setVisible(true);  //랭킹 화면 보이게
 				}
 				ImageIcon albumChangeImg = new ImageIcon(imagePath + "Album_"+ musicList.get(musicIndex).getTitle()+".png");  //앨범 커버 이미지
 				titleLabel.setText(musicList.get(musicIndex).getTitle());  //노래 제목 교체
@@ -580,7 +591,6 @@ public class Screen extends JFrame{
 				try {
 					Thread.sleep(400);
 				} catch (InterruptedException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 				highlightPlayer.play(musicPath+musicList.get(musicIndex).getTitle()+" highlight.mp3");  //하이라이트 재생
@@ -588,9 +598,9 @@ public class Screen extends JFrame{
 		};
 		
 		/*add*/
-		rightButton.addActionListener(buttonListener);  //버튼 액션 리스너
-		leftButton.addActionListener(buttonListener);  //버튼 액션 리스너
-		rankingButton.addActionListener(buttonListener);  //버튼 액션 리스너
+		rightButton.addActionListener(selelctbuttonListener);  //버튼 액션 리스너
+		leftButton.addActionListener(selelctbuttonListener);  //버튼 액션 리스너
+		rankingButton.addActionListener(selelctbuttonListener);  //버튼 액션 리스너
 		selectSongPanel.add(screenNameLabel);  //노래 선택 라벨
 		selectSongPanel.add(titleLabel);  //제목 라벨
 		selectSongPanel.add(singerLabel);  //가수 라벨
@@ -602,5 +612,59 @@ public class Screen extends JFrame{
 		selectSongPanel.add(selectSongLabel);  //노래 선택 화면 라벨
 		add(selectSongPanel);
 		selectSongPanel.setVisible(false);
+	}
+	
+	//랭킹 패널 만드는 메서드
+	public void generateRanking(int index) {
+		ImageIcon rankingEasyImg = new ImageIcon(imagePath + "Ranking_Easy_Screen.png");  //랭킹 쉬움 화면 이미지
+		ImageIcon rankingNormalImg = new ImageIcon(imagePath + "Ranking_Normal_Screen.png");  //랭킹 보통 화면 이미지
+		ImageIcon rankingHardImg = new ImageIcon(imagePath + "Ranking_Hard_Screen.png");  //랭킹 어려움 화면 이미지
+		ImageIcon albumImg = new ImageIcon(imagePath +musicList.get(index).getTitle()+"_Ranking.png");  //해당 노래 앨범 이미지
+		
+		JLabel rankingLabel = new JLabel(rankingEasyImg);  //랭킹 화면 라벨
+		JLabel albumLabel = new JLabel(albumImg);  //앨범 이미지 라벨
+		JLabel titleLabel = new JLabel(musicList.get(index).getTitle());  //노래 제목 라벨
+		JLabel singerLabel = new JLabel(musicList.get(index).getSinger());  //노래 가수 라벨
+		
+		JButton backButton = new JButton("돌아가기", new ImageIcon(imagePath+"Button.png"));  //돌아가기 버튼
+		
+		Font titleFont = new Font("TDTDTadakTadak",Font.PLAIN,70);   //제목 폰트
+		Font singerFont = new Font("TDTDTadakTadak",Font.PLAIN,55);   //가수 폰트
+		
+		switch(musicList.get(index).getTitle()) {
+		case "NIGHT DANCER" : rankingLabel.setIcon(rankingEasyImg); break; //나이트댄서면 쉬움 화면 이미지로
+		case "3D" : rankingLabel.setIcon(rankingNormalImg); break; //3D면 보통 화면 이미지로
+		case "ETA" : rankingLabel.setIcon(rankingHardImg); break;  //ETA면 어려움 화면 이미지로
+		}
+		
+		/*set*/
+		rankingPanel.setLayout(null);
+		rankingLabel.setBounds(0,0,FRAME_WIDTH,FRAME_HEIGHT);  //랭킹 화면 라벨
+		albumLabel.setBounds(0,0,FRAME_WIDTH,FRAME_HEIGHT);  //앨범 이미지 라벨
+		//돌아가기 버튼
+		backButton.setFont(buttonFont);
+		backButton.setBounds(540,730,320,75);
+		backButton.setHorizontalTextPosition(JButton.CENTER);
+		backButton.setRolloverIcon(clickButtonImg);  //호버링시 이미지 변경
+		transparencyButton(backButton);  //버튼 투명하게
+		//제목 라벨
+		titleLabel.setFont(titleFont);  //폰트 설정
+		FontMetrics titleFontMetrics = titleLabel.getFontMetrics(titleLabel.getFont());
+		int titleWidth = titleFontMetrics.stringWidth(titleLabel.getText());  //제목 길이 구함
+		titleLabel.setBounds(320 - (titleWidth/2), 140, titleWidth, 100);
+		//가수 라벨
+		singerLabel.setFont(singerFont);  //폰트 설정
+		FontMetrics singerFontMetrics = singerLabel.getFontMetrics(singerLabel.getFont());
+		int singerWidth = singerFontMetrics.stringWidth(singerLabel.getText());  //가수 길이 구함
+		singerLabel.setBounds(320 - (singerWidth/2), 195, singerWidth+100, 100);
+		/*add*/
+		backButton.addActionListener(buttonListener);
+		rankingPanel.add(titleLabel);  //제목 라벨
+		rankingPanel.add(singerLabel);  //가수 라벨
+		rankingPanel.add(backButton);  //돌아가기 버튼
+		rankingPanel.add(albumLabel);  //앨범 이미지 라벨
+		rankingPanel.add(rankingLabel);  //랭킹 화면 라벨
+		add(rankingPanel);
+		rankingPanel.setVisible(false);
 	}
 }
