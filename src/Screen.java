@@ -616,6 +616,13 @@ public class Screen extends JFrame{
 	
 	//랭킹 패널 만드는 메서드
 	public void generateRanking(int index) {
+		DB db = new DB();
+		db.connect();
+		String[] user = new String[5];  //닉네임 배열
+		int[] score = new int[5];  //점수 배열
+		String table = "";  //테이블 변수
+		int i = 0;
+		
 		ImageIcon rankingEasyImg = new ImageIcon(imagePath + "Ranking_Easy_Screen.png");  //랭킹 쉬움 화면 이미지
 		ImageIcon rankingNormalImg = new ImageIcon(imagePath + "Ranking_Normal_Screen.png");  //랭킹 보통 화면 이미지
 		ImageIcon rankingHardImg = new ImageIcon(imagePath + "Ranking_Hard_Screen.png");  //랭킹 어려움 화면 이미지
@@ -625,17 +632,46 @@ public class Screen extends JFrame{
 		JLabel albumLabel = new JLabel(albumImg);  //앨범 이미지 라벨
 		JLabel titleLabel = new JLabel(musicList.get(index).getTitle());  //노래 제목 라벨
 		JLabel singerLabel = new JLabel(musicList.get(index).getSinger());  //노래 가수 라벨
+		JLabel firstLabel = new JLabel();  //1위 닉네임 라벨
+		JLabel secondLabel = new JLabel();  //2위 닉네임 라벨
+		JLabel thirdLabel = new JLabel();  //3위 닉네임 라벨
+		JLabel fourthLabel = new JLabel();  //4위 닉네임 라벨
+		JLabel fifthLabel = new JLabel();  //5위 닉네임 라벨
+		JLabel firstScoreLabel = new JLabel();  //1위 점수 라벨
+		JLabel secondScoreLabel = new JLabel();  //2위 점수 라벨
+		JLabel thirdScoreLabel = new JLabel();  //3위 점수 라벨
+		JLabel fourthScoreLabel = new JLabel();  //4위 점수 라벨
+		JLabel fifthScoreLabel = new JLabel();  //5위점수  라벨
 		
 		JButton backButton = new JButton("돌아가기", new ImageIcon(imagePath+"Button.png"));  //돌아가기 버튼
 		
+		Font rankingFont = new Font("TDTDTadakTadak",Font.PLAIN,80);   //순위 폰트
 		Font titleFont = new Font("TDTDTadakTadak",Font.PLAIN,70);   //제목 폰트
 		Font singerFont = new Font("TDTDTadakTadak",Font.PLAIN,55);   //가수 폰트
 		
-		switch(musicList.get(index).getTitle()) {
-		case "NIGHT DANCER" : rankingLabel.setIcon(rankingEasyImg); break; //나이트댄서면 쉬움 화면 이미지로
-		case "3D" : rankingLabel.setIcon(rankingNormalImg); break; //3D면 보통 화면 이미지로
-		case "ETA" : rankingLabel.setIcon(rankingHardImg); break;  //ETA면 어려움 화면 이미지로
+		switch(musicList.get(index).getTitle()) {  //랭킹 화면 라벨 이미지 설정
+		case "NIGHT DANCER" : rankingLabel.setIcon(rankingEasyImg);  //나이트댄서면 쉬움 화면 이미지로
+			table = "ranking_night_dancer"; break;
+		case "3D" : rankingLabel.setIcon(rankingNormalImg);  //3D면 보통 화면 이미지로
+			table = "ranking_3d"; break;
+		case "ETA" : rankingLabel.setIcon(rankingHardImg);  //ETA면 어려움 화면 이미지로
+			table = "ranking_eta"; break;
 		}
+		
+		String sql = "SELECT * FROM "+ table +" ORDER BY score DESC limit 5";  //점수를 기준으로 오름차순하는 sql문
+		ResultSet result;
+		
+		try {
+			result = db.stmt.executeQuery(sql);
+			while (result.next()) {
+				user[i] = result.getString("user");  //닉네임 저장
+				score[i] = result.getInt("score");  //점수 저장
+				i++;
+		    }
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		db.closeConnection();  //db 연결 해제
 		
 		/*set*/
 		rankingPanel.setLayout(null);
@@ -657,8 +693,59 @@ public class Screen extends JFrame{
 		FontMetrics singerFontMetrics = singerLabel.getFontMetrics(singerLabel.getFont());
 		int singerWidth = singerFontMetrics.stringWidth(singerLabel.getText());  //가수 길이 구함
 		singerLabel.setBounds(320 - (singerWidth/2), 195, singerWidth+100, 100);
+		//순위 닉네임 라벨
+		firstLabel.setFont(rankingFont);  //폰트 설정
+		firstLabel.setText(user[0]);
+		firstLabel.setBounds(750,260,500,100);
+		
+		secondLabel.setFont(rankingFont);  //폰트 설정
+		secondLabel.setText(user[1]);
+		secondLabel.setBounds(750,350,500,100);
+		
+		thirdLabel.setFont(rankingFont);  //폰트 설정
+		thirdLabel.setText(user[2]);
+		thirdLabel.setBounds(750,420,500,100);
+		
+		fourthLabel.setFont(rankingFont);  //폰트 설정
+		fourthLabel.setText(user[3]);
+		fourthLabel.setBounds(750,500,500,100);
+		
+		fifthLabel.setFont(rankingFont);  //폰트 설정
+		fifthLabel.setText(user[4]);
+		fifthLabel.setBounds(750,590,500,100);
+		//순위 점수 라벨
+		firstScoreLabel.setFont(rankingFont);  //폰트 설정
+		firstScoreLabel.setText(String.valueOf(score[0]));
+		firstScoreLabel.setBounds(1000,260,500,100);
+		
+		secondScoreLabel.setFont(rankingFont);  //폰트 설정
+		secondScoreLabel.setText(String.valueOf(score[1]));
+		secondScoreLabel.setBounds(1000,350,500,100);
+		
+		thirdScoreLabel.setFont(rankingFont);  //폰트 설정
+		thirdScoreLabel.setText(String.valueOf(score[2]));
+		thirdScoreLabel.setBounds(1000,420,500,100);
+		
+		fourthScoreLabel.setFont(rankingFont);  //폰트 설정
+		fourthScoreLabel.setText(String.valueOf(score[3]));
+		fourthScoreLabel.setBounds(1000,500,500,100);
+		
+		fifthScoreLabel.setFont(rankingFont);  //폰트 설정
+		fifthScoreLabel.setText(String.valueOf(score[4]));
+		fifthScoreLabel.setBounds(1000,590,500,100);
+		
 		/*add*/
 		backButton.addActionListener(buttonListener);
+		rankingPanel.add(firstLabel);  //1위 닉네임 라벨
+		rankingPanel.add(secondLabel);  //2위 닉네임 라벨
+		rankingPanel.add(thirdLabel);  //3위 닉네임 라벨
+		rankingPanel.add(fourthLabel);  //4위 닉네임 라벨
+		rankingPanel.add(fifthLabel);  //5위 닉네임 라벨
+		rankingPanel.add(firstScoreLabel);  //1위 점수 라벨
+		rankingPanel.add(secondScoreLabel);  //2위 점수 라벨
+		rankingPanel.add(thirdScoreLabel);  //3위 점수 라벨
+		rankingPanel.add(fourthScoreLabel);  //4위 점수 라벨
+		rankingPanel.add(fifthScoreLabel);  //5위 점수 라벨
 		rankingPanel.add(titleLabel);  //제목 라벨
 		rankingPanel.add(singerLabel);  //가수 라벨
 		rankingPanel.add(backButton);  //돌아가기 버튼
