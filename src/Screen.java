@@ -18,13 +18,14 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 
 import javazoom.jl.player.MP3Player;
 
 public class Screen extends JFrame{
 	public static Game game;
 	Image screenImg;  //더블 버퍼링용 이미지
-	Graphics2D screenGraphics;  //더블 버퍼링용 그래픽
+	Graphics screenGraphics;  //더블 버퍼링용 그래픽
 	boolean isGame = false;  //게임 스크린이냐?
 	
 	private final int FRAME_WIDTH = 1400;  //가로 크기
@@ -68,7 +69,6 @@ public class Screen extends JFrame{
 	MP3Player highlightPlayer = new MP3Player();  //노래 하이라이트 재생용 MP3Player
 	
 	public Screen() {
-//		game = new Game();  //test
 		musicList.add(new Music("imase","NIGHT DANCER"));  //NIGHT DANCER 추가
 		musicList.add(new Music("정국","3D"));  //3D 추가
 		musicList.add(new Music("NewJeans","ETA"));  //ETA 추가  
@@ -138,9 +138,8 @@ public class Screen extends JFrame{
 	@Override
 	public void paint(Graphics g) {
 		screenImg = createImage(FRAME_WIDTH,FRAME_HEIGHT);  //더블 버퍼링용 이미지 생성
-		screenGraphics = (Graphics2D) screenImg.getGraphics();  //게임 그래픽에 생성
-		screenGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);  //안티 앨리어싱 설정(화질 좋아지게)
-		screenDraw(screenGraphics);  //화면 그리기
+		screenGraphics = screenImg.getGraphics();  //게임 그래픽에 생성
+		screenDraw((Graphics2D)screenGraphics);  //화면 그리기
 		g.drawImage(screenImg, 0, 0, null);  //마지막에 이미지를 추가
 		g.dispose();
 	}
@@ -150,11 +149,28 @@ public class Screen extends JFrame{
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);  //안티 앨리어싱 설정(화질 좋아지게)
 		if(isGame) {  //지금 게임 실행이면?
 			game.drawScreen(g);  //게임 화면 나옴
-			repaint();
+			 repaint(); 
 		}else {  //게임 실행이 아니라면
 			paintComponents(g);
 		}
 	}
+	//노래 선택 버튼을 눌렀을 때 액션 리스너
+	ActionListener choiceListener = new ActionListener() {
+		
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if(e.getActionCommand().equals("선택!")) {
+				highlightPlayer.stop();  //하이라이트 재생 멈춤
+				Music.music = new Music(musicList.get(musicIndex).getSinger(),musicList.get(musicIndex).getTitle());  //노래 설정
+				removeAll();  //전 화면 다 지워버림
+				isGame = true;  //게임이다.
+				game = new Game();  
+				game.start();  //게임 시작
+				setLocation(1000, 1000);  //윈도우 창 멀리 보내버림
+				setLocationRelativeTo(null);  //윈도우 창 다시 정중앙에
+			}
+		}
+	};
 	
 	//버튼 투명하게 만드는 메서드
 	private void transparencyButton(JButton button) {
@@ -601,6 +617,7 @@ public class Screen extends JFrame{
 		rightButton.addActionListener(selelctbuttonListener);  //버튼 액션 리스너
 		leftButton.addActionListener(selelctbuttonListener);  //버튼 액션 리스너
 		rankingButton.addActionListener(selelctbuttonListener);  //버튼 액션 리스너
+		selectButton.addActionListener(choiceListener);  //선택 버튼 액션 리스너
 		selectSongPanel.add(screenNameLabel);  //노래 선택 라벨
 		selectSongPanel.add(titleLabel);  //제목 라벨
 		selectSongPanel.add(singerLabel);  //가수 라벨
