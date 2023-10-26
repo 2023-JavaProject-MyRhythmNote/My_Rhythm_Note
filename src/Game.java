@@ -1,8 +1,8 @@
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Graphics2D;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -37,7 +37,7 @@ public class Game extends Thread{
 	
 	public ArrayList<Note> noteArrayList = new ArrayList<>();  //노트를 담는 arrayList
 	
-	Font font1 = new Font("TDTDTadakTadak",Font.PLAIN,150);  //노래 제목, 가수 폰트
+	Font font1 = new Font("TDTDTadakTadak",Font.PLAIN,110);  //노래 제목, 가수 폰트
 	Font font2 = new Font("TDTDTadakTadak",Font.PLAIN,90);  //노트 폰트
 	Font font3 = new Font("TDTDTadakTadak",Font.PLAIN,40);  //점수,콤보 폰트
 	
@@ -57,9 +57,7 @@ public class Game extends Thread{
 	Image bad;
 	
 	public Game() {
-		Music.music = new Music("NewJeans","ETA");
 		mp3.play(musicPath+Music.music.getTitle()+".mp3");  //노래 재생 시작
-		start();  //게임 시작
 		//노트 판정 효과 나오는 시간 조절
 	    judgmentTimer = new Timer(70, new ActionListener() {
 	        @Override
@@ -73,15 +71,15 @@ public class Game extends Thread{
 	}
 	
 	//게임 화면 그리기
-	public void drawScreen(Graphics2D g) {
-		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);  //안티 앨리어싱 설정(화질 좋아지게)
-		
+	public void drawScreen(Graphics g) {
 		g.setColor(Color.WHITE);  //글자 색 설정
 		
 		g.drawImage(game_Screen,0, 0, FRAME_WIDTH, FRAME_HEIGHT,null);  //게임화면 이미지
 		
 		g.setFont(font1);  //노래 가수, 제목 폰트 설정
-		g.drawString(Music.music.getSinger() + " - " + Music.music.getTitle(), 250, 160);  //노래 가수, 제목
+		FontMetrics titleFontMetrics = g.getFontMetrics(g.getFont());
+		int stringWidth = titleFontMetrics.stringWidth(Music.music.getSinger() + " - " + Music.music.getTitle());  //길이 구함
+		g.drawString(Music.music.getSinger() + " - " + Music.music.getTitle(), (FRAME_WIDTH- stringWidth)/2, 160);  //노래 가수, 제목
 		
 		//노트 이미지
 		g.drawImage(noteS, 80, 730, 200, 130,null);
@@ -126,7 +124,7 @@ public class Game extends Thread{
 		
 		//판정 이미지
 		g.drawImage(perfect,550,200,300,200,null);
-		g.drawImage(good,550,210,300,150,null);
+		g.drawImage(good,550,210,300,180,null);
 		g.drawImage(bad,550,190,300,180,null);
 		
 		g.dispose();
