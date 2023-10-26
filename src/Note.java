@@ -1,13 +1,7 @@
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.RenderingHints;
-import java.awt.Shape;
 
 import javax.swing.ImageIcon;
-import javax.swing.RepaintManager;
-
-import com.mysql.cj.x.protobuf.MysqlxNotice.Frame;
 
 //노트가 내려오는 클래스
 public class Note extends Thread{
@@ -43,7 +37,6 @@ public class Note extends Thread{
 		if(noteType.equals("L")) {
 			this.x = 1130; 
 		}
-		
 	}
 	
 	//getter

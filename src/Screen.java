@@ -1,4 +1,3 @@
-import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
@@ -17,8 +16,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 
 import javazoom.jl.player.MP3Player;
 
@@ -30,7 +27,7 @@ public class Screen extends JFrame{
 	
 	private final int FRAME_WIDTH = 1400;  //가로 크기
 	private final int FRAME_HEIGHT = 900;  //세로 크기
-	int musicIndex = 0;  //앨범 이미지 인덱스
+	int musicIndex = 0;  //노래 인덱스
 	
 	String imagePath = System.getProperty("user.dir")+"/src/images/";  //이미지 상대 경로
 	ImageIcon startImg = new ImageIcon(imagePath + "Start_Screen.png"); //시작화면 이미지
@@ -90,7 +87,6 @@ public class Screen extends JFrame{
 		gameRuleButton.setBounds(300,500,150,150);
 		gameRuleButton.setFont(buttonFont);
 		gameRuleButton.setHorizontalTextPosition(JButton.CENTER);
-		gameRuleButton.setActionCommand("게임방법");
 		//로고 라벨1
 		logoTextLabel1.setFont(font1);
 		logoTextLabel1.setBounds(0, -300, FRAME_WIDTH, FRAME_HEIGHT);
@@ -114,9 +110,24 @@ public class Screen extends JFrame{
 		
 		/*add*/
 		addKeyListener(new NoteKeyListener());  //키 리스너 추가
-		signInButton.addActionListener(buttonListener);
-		signUpButton.addActionListener(buttonListener);
-		gameRuleButton.addActionListener(buttonListener);
+		//로그인 버튼 액션리스너
+		signInButton.addActionListener(e->{
+			startPanel.setVisible(false);  //시작화면 숨김
+			generateSignIn();  //로그인 화면 생성
+			signInPanel.setVisible(true);  //로그인 화면 보이게
+		});
+		//회원가입 버튼 액션리스너
+		signUpButton.addActionListener(e->{
+			startPanel.setVisible(false);  //시작화면 숨김
+			generateSignUp();  //회원가입 화면 생성
+            signUpPanel.setVisible(true);  //회원가입 화면 보이게
+		});
+		//게임방법 버튼 액션리스너
+		gameRuleButton.addActionListener(e->{
+			startPanel.setVisible(false);  //시작화면 숨김
+        	generateGameRule();  //게임방법 화면 생성
+        	gameRulePanel.setVisible(true);  //게임방법 화면 보이게
+		});
 		startPanel.add(signInButton);  //로그인 버튼
 		startPanel.add(signUpButton);  //회원가입 버튼
 		startPanel.add(gameRuleButton);  //게임방법 버튼
@@ -154,23 +165,6 @@ public class Screen extends JFrame{
 			paintComponents(g);
 		}
 	}
-	//노래 선택 버튼을 눌렀을 때 액션 리스너
-	ActionListener choiceListener = new ActionListener() {
-		
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			if(e.getActionCommand().equals("선택!")) {
-				highlightPlayer.stop();  //하이라이트 재생 멈춤
-				Music.music = new Music(musicList.get(musicIndex).getSinger(),musicList.get(musicIndex).getTitle());  //노래 설정
-				removeAll();  //전 화면 다 지워버림
-				isGame = true;  //게임이다.
-				game = new Game();  
-				game.start();  //게임 시작
-				setLocation(1000, 1000);  //윈도우 창 멀리 보내버림
-				setLocationRelativeTo(null);  //윈도우 창 다시 정중앙에
-			}
-		}
-	};
 	
 	//버튼 투명하게 만드는 메서드
 	private void transparencyButton(JButton button) {
@@ -231,8 +225,11 @@ public class Screen extends JFrame{
 		signInPanel.add(signInNicknameTF);  //닉네임 텍스트 필드
 		signInPanel.add(signInPasswordTF);  //비번 텍스트 필드
 		
+		OKButton.addActionListener(e->{
+			doSignIn();  //로그인 기능
+		});
+		
 		signInPanel.add(OKButton);  //확인 버튼
-		OKButton.addActionListener(buttonListener);
 		signInPanel.add(signInScreenLabel);
 		add(signInPanel);
 		signInPanel.setVisible(false);
@@ -273,42 +270,6 @@ public class Screen extends JFrame{
 			selectSongPanel.setVisible(true);  //노래 선택 화면 보이게
 		}
 	}
-	
-	//버튼 액션리스너
-	ActionListener buttonListener = new ActionListener() {
-		
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			startPanel.setVisible(false);  //시작화면 숨김
-			
-			if (e.getActionCommand().equals("로그인")) {
-				generateSignIn();  //로그인 화면 생성
-				signInPanel.setVisible(true);  //로그인 화면 보이게
-            }
-			if (e.getActionCommand().equals("회원가입")) {
-               generateSignUp();  //회원가입 화면 생성
-               signUpPanel.setVisible(true);  //회원가입 화면 보이게
-            }
-			if (e.getActionCommand().equals("게임방법")) {
-            	generateGameRule();  //게임방법 화면 생성
-            	gameRulePanel.setVisible(true);  //게임방법 화면 보이게
-            } 
-			if (e.getActionCommand().equals("로그인!")) {
-        		doSignIn();  //로그인 기능
-            }
-			if (e.getActionCommand().equals("회원가입!")) {
-        		doSignUp();  //회원가입 기능
-            }
-			if (e.getActionCommand().equals("알겠어!")) {
-            	gameRulePanel.setVisible(false);  //게임방법 화면 숨김
-            	startPanel.setVisible(true);  //시작화면 보이게
-            }
-			if(e.getActionCommand().equals("돌아가기")) {
-				rankingPanel.removeAll();  //랭킹 화면 지워버림
-				selectSongPanel.setVisible(true);    //노래 선택 화면 보이게
-			}
-		}
-	};
 	
 	//회원가입 패널 만드는 메서드
 	private void generateSignUp() {
@@ -367,6 +328,9 @@ public class Screen extends JFrame{
 		checkPasswordLabel.setVisible(false);
 		
 		/*add*/
+		OKButton.addActionListener(e->{
+			doSignUp();  //회원가입 기능
+		});
 		signUpPanel.add(signUpText);  //로그인 텍스트 라벨
 		signUpPanel.add(nickNameText);  //닉네임 텍스트 라벨
 		signUpPanel.add(passwordText);  //비번 텍스트 라벨
@@ -377,7 +341,6 @@ public class Screen extends JFrame{
 		signUpPanel.add(overlapNicknameLabel);  //중복 닉네임 안내 라벨
 		signUpPanel.add(checkPasswordLabel);  //비번 불일치 안내 라벨
 		signUpPanel.add(OKButton);  //확인 버튼
-		OKButton.addActionListener(buttonListener);
 		signUpPanel.add(signUpScreenLabel);
 		add(signUpPanel);
 		signUpPanel.setVisible(false);
@@ -502,9 +465,11 @@ public class Screen extends JFrame{
 		gameRulePanel.add(gameRuleLabel3);  //게임방법 설명 텍스트 라벨3
 		gameRulePanel.add(gameRuleLabel4);  //게임방법 설명 텍스트 라벨4
 		gameRulePanel.add(gameRuleLabel5);  //게임방법 설명 텍스트 라벨5
-		OKButton.addActionListener(buttonListener);  //액션리스너
+		OKButton.addActionListener(e->{
+			gameRulePanel.setVisible(false);  //게임방법 화면 숨김
+        	startPanel.setVisible(true);  //시작화면 보이게
+		});  //액션리스너
 		gameRulePanel.add(OKButton);  //확인 버튼
-		
 		gameRulePanel.add(gameRuleScreenLabel);  //게임방법 화면 라벨
 		add(gameRulePanel);
 		gameRulePanel.setVisible(false);
@@ -573,7 +538,6 @@ public class Screen extends JFrame{
 		rankingButton.setBounds(1050,0,320,80);
 		transparencyButton(rankingButton);  //버튼 투명하게
 		rankingButton.setFont(buttonFont);  //폰트 설정
-		rankingButton.setActionCommand("랭킹보기");
 		rankingButton.setHorizontalTextPosition(JButton.CENTER);
 		rankingButton.setRolloverIcon(clickRankingButtonImg);  //호버링시 이미지 변경
 		
@@ -589,11 +553,6 @@ public class Screen extends JFrame{
 					if(musicIndex>0)   //0보다 크다면 인덱스 감소
 						musicIndex--;
 				}
-				if(e.getActionCommand().equals("랭킹보기")) {
-					selectSongPanel.setVisible(false);  //노래 선택 화면 숨김
-					generateRanking(musicIndex);  //랭킹 화면 생성 메서드
-					rankingPanel.setVisible(true);  //랭킹 화면 보이게
-				}
 				ImageIcon albumChangeImg = new ImageIcon(imagePath + "Album_"+ musicList.get(musicIndex).getTitle()+".png");  //앨범 커버 이미지
 				titleLabel.setText(musicList.get(musicIndex).getTitle());  //노래 제목 교체
 				singerLabel.setText(musicList.get(musicIndex).getSinger());  //노래 가수 교체
@@ -603,9 +562,9 @@ public class Screen extends JFrame{
 					highlightPlayer.stop();  //노래 정지
 				}
 				
-				//노래가 끊기는 게 어색해서 넣음
+				//노래 끊기는 게 어색해서 넣음
 				try {
-					Thread.sleep(400);
+					Thread.sleep(350);
 				} catch (InterruptedException e1) {
 					e1.printStackTrace();
 				}
@@ -614,10 +573,27 @@ public class Screen extends JFrame{
 		};
 		
 		/*add*/
-		rightButton.addActionListener(selelctbuttonListener);  //버튼 액션 리스너
-		leftButton.addActionListener(selelctbuttonListener);  //버튼 액션 리스너
-		rankingButton.addActionListener(selelctbuttonListener);  //버튼 액션 리스너
-		selectButton.addActionListener(choiceListener);  //선택 버튼 액션 리스너
+		rightButton.addActionListener(selelctbuttonListener);  //오른쪽 버튼 액션 리스너
+		leftButton.addActionListener(selelctbuttonListener);  //왼쪽 버튼 액션 리스너
+		 //랭킹 버튼 액션 리스너
+		rankingButton.addActionListener(e->{ 
+			selectSongPanel.setVisible(false);  //노래 선택 화면 숨김
+			generateRanking(musicIndex);  //랭킹 화면 생성 메서드
+			rankingPanel.setVisible(true);  //랭킹 화면 보이게
+		}); 
+		
+		//선택 버튼 액션 리스너
+		selectButton.addActionListener(e->{
+			highlightPlayer.stop();  //하이라이트 재생 멈춤
+			Music.music = new Music(musicList.get(musicIndex).getSinger(),musicList.get(musicIndex).getTitle());  //노래 설정
+			removeAll();  //전 화면 다 지워버림
+			isGame = true;  //게임이다.
+			game = new Game();  
+			game.start();  //게임 시작
+			setLocation(1000, 1000);  //윈도우 창 멀리 보내버림
+			setLocationRelativeTo(null);  //윈도우 창 다시 정중앙에
+		});
+		
 		selectSongPanel.add(screenNameLabel);  //노래 선택 라벨
 		selectSongPanel.add(titleLabel);  //제목 라벨
 		selectSongPanel.add(singerLabel);  //가수 라벨
@@ -752,7 +728,11 @@ public class Screen extends JFrame{
 		fifthScoreLabel.setBounds(1000,590,500,100);
 		
 		/*add*/
-		backButton.addActionListener(buttonListener);
+		backButton.addActionListener(e->{
+			rankingPanel.removeAll();  //랭킹 화면 지워버림
+			selectSongPanel.setVisible(true);    //노래 선택 화면 보이게
+		});
+		
 		rankingPanel.add(firstLabel);  //1위 닉네임 라벨
 		rankingPanel.add(secondLabel);  //2위 닉네임 라벨
 		rankingPanel.add(thirdLabel);  //3위 닉네임 라벨
