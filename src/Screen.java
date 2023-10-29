@@ -23,7 +23,7 @@ public class Screen extends JFrame{
 	public static Game game;
 	Image screenImg;  //더블 버퍼링용 이미지
 	Graphics screenGraphics;  //더블 버퍼링용 그래픽
-	boolean isGame = false;  //게임 스크린이냐?
+	public static boolean isGame = false;  //게임 스크린이냐?
 	
 	private final int FRAME_WIDTH = 1400;  //가로 크기
 	private final int FRAME_HEIGHT = 900;  //세로 크기
@@ -51,6 +51,7 @@ public class Screen extends JFrame{
 	JPanel gameRulePanel = new JPanel();  //게임방법 패널
 	JPanel selectSongPanel = new JPanel();  //노래 선택 패널
 	JPanel rankingPanel = new JPanel();  //랭킹 패널
+	JPanel scorePanel = new JPanel();  //점수 패널
 	
 	JTextField signInNicknameTF = new JTextField();  //로그인 닉네임 텍스트 필드
 	JTextField signInPasswordTF = new JTextField();  //로그인 비밀번호 텍스트 필드
@@ -68,8 +69,7 @@ public class Screen extends JFrame{
 	public Screen() {
 		musicList.add(new Music("imase","NIGHT DANCER"));  //NIGHT DANCER 추가
 		musicList.add(new Music("정국","3D"));  //3D 추가
-		musicList.add(new Music("NewJeans","ETA"));  //ETA 추가  
-		
+		musicList.add(new Music("NewJeans","ETA"));  //ETA 추가 
 		/*set*/
 		startPanel.setLayout(null);   //시작화면
 		setFocusable(true);
@@ -586,7 +586,7 @@ public class Screen extends JFrame{
 		selectButton.addActionListener(e->{
 			highlightPlayer.stop();  //하이라이트 재생 멈춤
 			Music.music = new Music(musicList.get(musicIndex).getSinger(),musicList.get(musicIndex).getTitle());  //노래 설정
-			removeAll();  //전 화면 다 지워버림
+			selectSongPanel.setVisible(false);  //노래 선택 화면 숨김
 			isGame = true;  //게임이다.
 			game = new Game();  
 			game.start();  //게임 시작
@@ -750,5 +750,14 @@ public class Screen extends JFrame{
 		rankingPanel.add(rankingLabel);  //랭킹 화면 라벨
 		add(rankingPanel);
 		rankingPanel.setVisible(false);
+	}
+	
+	public void generateScore() {
+		JLabel scoreLabel = new JLabel(new ImageIcon(imagePath + "Score_Screen.png"));  //점수 화면 이미지 라벨
+		scorePanel.setLayout(null);
+		scoreLabel.setBounds(0, 0, FRAME_WIDTH, FRAME_HEIGHT);
+		scorePanel.add(scoreLabel);
+		add(scorePanel);
+		scorePanel.setVisible(false);
 	}
 }
