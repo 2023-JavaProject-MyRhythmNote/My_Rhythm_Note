@@ -7,17 +7,15 @@ import javax.swing.ImageIcon;
 public class Note extends Thread{
 	String imagePath = System.getProperty("user.dir")+"/src/images/";  //이미지 상대 경로
 	Image noteImage = new ImageIcon(imagePath+"Note.png").getImage();  //노트 이미지
-	int x, y = 100;  //노트의 x, y 위치
+	int x;  //노트의 x 위치
+	int y = 740-(1000 / Main.SLEEP_TIME * Main.NOTE_SPEED* Main.REACH_TIME);  //노트의 y 위치
 	String noteType;  //노트의 타입
 	int startTime;  //노트가 나오는 시간
-	
-//	private static final int BPM = 150; // test Super Shy BPM 값 설정
-//	private static final int PIXELS_PER_BEAT = (int)(900/(60.0 / BPM));  // 한 비트당 움직여야 할 거리 계산
-	
+    
 	public Note(NoteList notelist) {
 		this.noteType = notelist.getNoteType();
 		this.startTime = notelist.getStartTime();
-		 
+		
 		//노트의 타입으로 x좌표의 위치를 정함
 		if(noteType.equals("S")) {
 			this.x = 80; 
@@ -59,8 +57,8 @@ public class Note extends Thread{
 		try {
 			Thread.sleep(startTime);  //노트가 startTime이 지나고 등장함
 			while(true) {
-				this.y += 10;  //y좌표를 증가
-				Thread.sleep(10); 
+				this.y += Main.NOTE_SPEED;  //y좌표를 증가
+				Thread.sleep(Main.SLEEP_TIME); 
 			}//while
 		} catch (InterruptedException e) {
 			e.printStackTrace();

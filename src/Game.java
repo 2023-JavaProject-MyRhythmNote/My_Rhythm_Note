@@ -26,6 +26,7 @@ public class Game extends Thread{
 	int countGood;  //굿 카운트
 	int countPerfect;  //퍼펙트 카운트
 	int countBad;  //배드 카운트
+	boolean gameEnd = false;
 	
 	//이펙트 바 이미지
 	Image EffectBar_S;
@@ -112,7 +113,7 @@ public class Game extends Thread{
 			note.drawNote(g);
 		}
 
-	    missNote(850);  //노트의 y 좌표가 820을 넘어가면 삭제되도록 함
+	    missNote(830);  //노트의 y 좌표가 830을 넘어가면 삭제되도록 함
 	    
 		//키보드 눌렀을때 효과
 		g.drawImage(EffectBar_S, 80, 200, 200, 700,null);
@@ -133,15 +134,127 @@ public class Game extends Thread{
 	
 	//노트를 내려오게 하는 메서드
 	public void dropNote() {
-		NoteList[] notelist = {  //노트 리스트에서 노트 찍기
-				new NoteList("S", 3000),new NoteList("S",3500)
-				,new NoteList("S",4000),new NoteList("D",4300),new NoteList("K",4800)
-				,new NoteList("F",5000),new NoteList("J",5500),new NoteList("S",6000)
-				,new NoteList("L",6500),new NoteList("D",7000),new NoteList("L",7500)
-				,new NoteList("D",8000),new NoteList("J",8500),new NoteList("L",9000)
-				,new NoteList("S",9500),new NoteList("F",10000),new NoteList("K",10500)
-		};  //test
+		NoteList[] notelist = null;  //노트 리스트에서 노트 찍기
 		
+		if(Music.music.getTitle().equals("NIGHT DANCER")) {
+			int bpm = 117; // 노래의 BPM
+			double beatDuration = 60.0 / bpm; // 1 비트당 시간 (초 단위)
+			int noteDuration = (int) (beatDuration * 1000); // 1 비트당 시간 (밀리초 단위)
+			notelist = new NoteList[]{
+				    new NoteList("S", noteDuration),
+				    new NoteList("D", noteDuration * 2),
+				    new NoteList("F", noteDuration * 4),
+				    new NoteList("D", noteDuration * 7),
+				    new NoteList("S", noteDuration * 8),
+				    new NoteList("S", noteDuration * 10),
+				    new NoteList("K", noteDuration * 12),
+				    new NoteList("F", noteDuration * 15),
+				    new NoteList("S", noteDuration * 18),
+				    new NoteList("K", noteDuration * 20),
+				    new NoteList("S", noteDuration * 24),
+				    new NoteList("J", noteDuration * 28),
+				    new NoteList("J", noteDuration * 32),
+				    new NoteList("S", noteDuration * 38),
+				    new NoteList("L", noteDuration * 42),
+				    new NoteList("J", noteDuration * 46),
+				    new NoteList("J", noteDuration * 50),
+				    new NoteList("S", noteDuration * 54),
+				    new NoteList("D", noteDuration * 58),
+				    new NoteList("F", noteDuration * 62),
+				    new NoteList("K", noteDuration * 66),
+				    new NoteList("F", noteDuration * 70),
+				    new NoteList("S", noteDuration * 74),
+				    new NoteList("K", noteDuration * 78),
+				    new NoteList("K", noteDuration * 82),
+				    new NoteList("L", noteDuration * 86),
+				    new NoteList("K", noteDuration * 90),
+				    new NoteList("J", noteDuration * 94),
+				    new NoteList("D", noteDuration * 98),
+				    new NoteList("J", noteDuration * 102),
+				    new NoteList("J", noteDuration * 106),
+				    new NoteList("F", noteDuration * 110),
+				    new NoteList("L", noteDuration * 114),
+//				    new NoteList("K", noteDuration * 118),
+//				    new NoteList("J", noteDuration * 122),
+//				    new NoteList("S", noteDuration * 126),
+//				    new NoteList("L", noteDuration * 130),
+//				    new NoteList("D", noteDuration * 134),
+//				    new NoteList("F", noteDuration * 138),
+//				    new NoteList("K", noteDuration * 142),
+//				    new NoteList("F", noteDuration * 146),
+//				    new NoteList("S", noteDuration * 150),
+//				    new NoteList("K", noteDuration * 154),
+//				    new NoteList("K", noteDuration * 158),
+//				    new NoteList("L", noteDuration * 162),
+//				    new NoteList("K", noteDuration * 166),
+//				    new NoteList("J", noteDuration * 170),
+//				    new NoteList("D", noteDuration * 174),
+//				    new NoteList("J", noteDuration * 178),
+//				    new NoteList("J", noteDuration * 182)
+				};
+		}else if(Music.music.getTitle().equals("3D")) {
+			int startTime = 1000;  //시작 시간
+			int gap = 0;
+			notelist = new NoteList[]{
+//				    new NoteList("S", startTime + gap * 2),new NoteList("D", startTime + gap * 4),
+//				    new NoteList("D", startTime + gap * 6),new NoteList("J", startTime + gap * 8),
+//				    new NoteList("K", startTime + gap * 10),new NoteList("D", startTime + gap * 12),
+//				    new NoteList("S", startTime + gap * 14),new NoteList("F", startTime + gap * 16),
+//				    new NoteList("L", startTime + gap * 18),new NoteList("J", startTime + gap * 20),
+//				    new NoteList("K", startTime + gap * 22),new NoteList("S", startTime + gap * 24),
+//				    new NoteList("F", startTime + gap * 26),new NoteList("D", startTime + gap * 28),
+//				    new NoteList("F", startTime + gap * 30),new NoteList("J", startTime + gap * 32),
+//				    new NoteList("K", startTime + gap * 34),new NoteList("S", startTime + gap * 36),
+//				    new NoteList("S", startTime + gap * 38),new NoteList("L", startTime + gap * 40),
+//				    new NoteList("F", startTime + gap * 42),new NoteList("J", startTime + gap * 44),
+//				    new NoteList("J", startTime + gap * 46),new NoteList("L", startTime + gap * 48),
+//				    new NoteList("S", startTime + gap * 50),new NoteList("D", startTime + gap * 52),
+//				    new NoteList("K", startTime + gap * 54),new NoteList("F", startTime + gap * 56),
+//				    new NoteList("J", startTime + gap * 58),new NoteList("L", startTime + gap * 60),
+//				    new NoteList("F", startTime + gap * 62),new NoteList("D", startTime + gap * 64),
+//				    new NoteList("J", startTime + gap * 66),new NoteList("K", startTime + gap * 68),
+//				    new NoteList("S", startTime + gap * 70),new NoteList("L", startTime + gap * 72),
+//				    new NoteList("K", startTime + gap * 74),new NoteList("S", startTime + gap * 76),
+//				    new NoteList("F", startTime + gap * 78),new NoteList("D", startTime + gap * 80),
+//				    new NoteList("S", startTime + gap * 82),new NoteList("J", startTime + gap * 84),
+//				    new NoteList("D", startTime + gap * 86),new NoteList("F", startTime + gap * 88),
+//				    new NoteList("J", startTime + gap * 90),new NoteList("L", startTime + gap * 92),
+//				    new NoteList("K", startTime + gap * 94),new NoteList("S", startTime + gap * 96),
+//				    new NoteList("S", startTime + gap * 98),new NoteList("F", startTime + gap * 100),
+//				    new NoteList("D", startTime + gap * 102),new NoteList("K", startTime + gap * 104),
+//				    new NoteList("J", startTime + gap * 106),new NoteList("L", startTime + gap * 108),
+//				    new NoteList("F", startTime + gap * 110),new NoteList("S", startTime + gap * 112),
+//				    new NoteList("D", startTime + gap * 114),new NoteList("J", startTime + gap * 116),
+//				    new NoteList("K", startTime + gap * 118),new NoteList("L", startTime + gap * 120),
+//				    new NoteList("S", startTime + gap * 122),new NoteList("F", startTime + gap * 124),
+//				    new NoteList("J", startTime + gap * 126),new NoteList("K", startTime + gap * 128),
+//				    new NoteList("D", startTime + gap * 130),new NoteList("S", startTime + gap * 132),
+//				    new NoteList("F", startTime + gap * 134),new NoteList("L", startTime + gap * 136),
+//				    new NoteList("J", startTime + gap * 138),new NoteList("K", startTime + gap * 140),
+//				    new NoteList("S", startTime + gap * 142),new NoteList("D", startTime + gap * 144),
+//				    new NoteList("K", startTime + gap * 146),new NoteList("F", startTime + gap * 148),
+//				    new NoteList("J", startTime + gap * 150),new NoteList("L", startTime + gap * 152),
+//				    new NoteList("S", startTime + gap * 154),new NoteList("F", startTime + gap * 156),
+//				    new NoteList("D", startTime + gap * 158),new NoteList("F", startTime + gap * 160),
+//				    new NoteList("J", startTime + gap * 162),new NoteList("K", startTime + gap * 164),
+//				    new NoteList("S", startTime + gap * 166),new NoteList("S", startTime + gap * 168),
+//				    new NoteList("L", startTime + gap * 170),new NoteList("F", startTime + gap * 172),
+//				    new NoteList("J", startTime + gap * 174), new NoteList("J", startTime + gap * 176),
+//				    new NoteList("L", startTime + gap * 178),new NoteList("S", startTime + gap * 180),
+//				    new NoteList("D", startTime + gap * 182),new NoteList("K", startTime + gap * 184),
+//				    new NoteList("F", startTime + gap * 186), new NoteList("J", startTime + gap * 188),
+//				    new NoteList("L", startTime + gap * 190),new NoteList("S", startTime + gap * 192),
+//				    new NoteList("D", startTime + gap * 194),new NoteList("K", startTime + gap * 196),
+//				    new NoteList("F", startTime + gap * 198),new NoteList("J", startTime + gap * 200)
+				};
+		}else if(Music.music.getTitle().equals("ETA")) {
+			int bpm = 135; // 노래의 BPM
+			double beatDuration = 60.0 / bpm; // 1 비트당 시간 (초 단위)
+			int noteDuration = (int) (beatDuration * 1000); // 1 비트당 시간 (밀리초 단위)
+			notelist = new NoteList[]{  //노트 리스트에서 노트 찍기
+					new NoteList("F", noteDuration*1)
+			};  //test
+		}
 		for (NoteList item : notelist) {
 		    Note note = new Note(item);  //노트리스트 배열에서 하나씩 가지고 와서 넣음
 		    note.start();  //Note 클래스 스레드 시작
@@ -162,25 +275,32 @@ public class Game extends Thread{
 			if (note.getY() >=120 && note.getNoteType().equals(noteType)) {
 				//노트 판정
 		        //perfect
-		        if (note.getY() >=720 && note.getY() <=740 && note.getNoteType().equals(noteType)) {
+		        if (note.getY() >=720 && note.getY() <=750 && note.getNoteType().equals(noteType)) {
 		        	perfect = new ImageIcon(imagePath+"Perfect.png").getImage();
 		        	score += 1000;  //1000점 증가
 		        	combo++;  //콤보 수 증가
 		        	countPerfect++;  //퍼펙트 수 증가
 		        }//good
-		        else if (note.getY() >=700 && note.getY() <=750 && note.getNoteType().equals(noteType)) {
+		        else if (note.getY() >=700 && note.getY() <=760 && note.getNoteType().equals(noteType)) {
 		        	good = new ImageIcon(imagePath+"Good.png").getImage();
 		        	score += 800;  //800점 증가
 		        	combo++;  //콤보 수 증가
 		        	countGood++;  //굿 수 증가
 		        }//bad
-		        else if (note.getY() < 700 || note.getY() >750 && note.getNoteType().equals(noteType)) {
+		        else if (note.getY() < 700 || note.getY() >760 && note.getNoteType().equals(noteType)) {
 		        	bad = new ImageIcon(imagePath+"Bad.png").getImage();
 		        	combo = 0;  //콤보 수 초기화
 		        	countBad++;  //배드 수 증가
 		        }
 		        noteArrayList.remove(i);  //노트 arrayList에서 삭제
 		        judgmentTimer.restart();
+
+				if(noteArrayList.isEmpty()) {  //게임이 끝나면 점수 화면으로 이동
+					Main.screen.isGame = false;  //이제 게임 아님
+					mp3.stop();  //test
+					Main.screen.generateScore(countPerfect,countGood,countBad,combo,score);  //점수 화면 생성
+					Main.screen.scorePanel.setVisible(true);  //점수 화면 패널 보이게
+				}
 	            break;  //노트 중복 삭제 안되도록 
 			}
 	    }

@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
@@ -23,7 +24,7 @@ public class Screen extends JFrame{
 	public static Game game;
 	Image screenImg;  //더블 버퍼링용 이미지
 	Graphics screenGraphics;  //더블 버퍼링용 그래픽
-	boolean isGame = false;  //게임 스크린이냐?
+	public static boolean isGame = false;  //게임 스크린이냐?
 	
 	private final int FRAME_WIDTH = 1400;  //가로 크기
 	private final int FRAME_HEIGHT = 900;  //세로 크기
@@ -51,6 +52,7 @@ public class Screen extends JFrame{
 	JPanel gameRulePanel = new JPanel();  //게임방법 패널
 	JPanel selectSongPanel = new JPanel();  //노래 선택 패널
 	JPanel rankingPanel = new JPanel();  //랭킹 패널
+	JPanel scorePanel = new JPanel();  //점수 패널
 	
 	JTextField signInNicknameTF = new JTextField();  //로그인 닉네임 텍스트 필드
 	JTextField signInPasswordTF = new JTextField();  //로그인 비밀번호 텍스트 필드
@@ -68,11 +70,11 @@ public class Screen extends JFrame{
 	public Screen() {
 		musicList.add(new Music("imase","NIGHT DANCER"));  //NIGHT DANCER 추가
 		musicList.add(new Music("정국","3D"));  //3D 추가
-		musicList.add(new Music("NewJeans","ETA"));  //ETA 추가  
-		
+		musicList.add(new Music("NewJeans","ETA"));  //ETA 추가 
 		/*set*/
 		startPanel.setLayout(null);   //시작화면
 		setFocusable(true);
+		
 		//로그인 버튼
 		signInButton.setBounds(540,650,320,75);
 		signInButton.setFont(buttonFont);
@@ -578,7 +580,7 @@ public class Screen extends JFrame{
 		 //랭킹 버튼 액션 리스너
 		rankingButton.addActionListener(e->{ 
 			selectSongPanel.setVisible(false);  //노래 선택 화면 숨김
-			generateRanking(musicIndex);  //랭킹 화면 생성 메서드
+			generateRanking();  //랭킹 화면 생성 메서드
 			rankingPanel.setVisible(true);  //랭킹 화면 보이게
 		}); 
 		
@@ -586,7 +588,7 @@ public class Screen extends JFrame{
 		selectButton.addActionListener(e->{
 			highlightPlayer.stop();  //하이라이트 재생 멈춤
 			Music.music = new Music(musicList.get(musicIndex).getSinger(),musicList.get(musicIndex).getTitle());  //노래 설정
-			removeAll();  //전 화면 다 지워버림
+			selectSongPanel.setVisible(false);  //노래 선택 화면 숨김
 			isGame = true;  //게임이다.
 			game = new Game();  
 			game.start();  //게임 시작
@@ -608,7 +610,7 @@ public class Screen extends JFrame{
 	}
 	
 	//랭킹 패널 만드는 메서드
-	public void generateRanking(int index) {
+	public void generateRanking() {
 		DB db = new DB();
 		db.connect();
 		String[] user = new String[5];  //닉네임 배열
@@ -619,12 +621,12 @@ public class Screen extends JFrame{
 		ImageIcon rankingEasyImg = new ImageIcon(imagePath + "Ranking_Easy_Screen.png");  //랭킹 쉬움 화면 이미지
 		ImageIcon rankingNormalImg = new ImageIcon(imagePath + "Ranking_Normal_Screen.png");  //랭킹 보통 화면 이미지
 		ImageIcon rankingHardImg = new ImageIcon(imagePath + "Ranking_Hard_Screen.png");  //랭킹 어려움 화면 이미지
-		ImageIcon albumImg = new ImageIcon(imagePath +musicList.get(index).getTitle()+"_Ranking.png");  //해당 노래 앨범 이미지
+		ImageIcon albumImg = new ImageIcon(imagePath +musicList.get(musicIndex).getTitle()+"_Ranking.png");  //해당 노래 앨범 이미지
 		
 		JLabel rankingLabel = new JLabel(rankingEasyImg);  //랭킹 화면 라벨
 		JLabel albumLabel = new JLabel(albumImg);  //앨범 이미지 라벨
-		JLabel titleLabel = new JLabel(musicList.get(index).getTitle());  //노래 제목 라벨
-		JLabel singerLabel = new JLabel(musicList.get(index).getSinger());  //노래 가수 라벨
+		JLabel titleLabel = new JLabel(musicList.get(musicIndex).getTitle());  //노래 제목 라벨
+		JLabel singerLabel = new JLabel(musicList.get(musicIndex).getSinger());  //노래 가수 라벨
 		JLabel firstLabel = new JLabel();  //1위 닉네임 라벨
 		JLabel secondLabel = new JLabel();  //2위 닉네임 라벨
 		JLabel thirdLabel = new JLabel();  //3위 닉네임 라벨
@@ -642,7 +644,7 @@ public class Screen extends JFrame{
 		Font titleFont = new Font("TDTDTadakTadak",Font.PLAIN,70);   //제목 폰트
 		Font singerFont = new Font("TDTDTadakTadak",Font.PLAIN,55);   //가수 폰트
 		
-		switch(musicList.get(index).getTitle()) {  //랭킹 화면 라벨 이미지 설정
+		switch(musicList.get(musicIndex).getTitle()) {  //랭킹 화면 라벨 이미지 설정
 		case "NIGHT DANCER" : rankingLabel.setIcon(rankingEasyImg);  //나이트댄서면 쉬움 화면 이미지로
 			table = "ranking_night_dancer"; break;
 		case "3D" : rankingLabel.setIcon(rankingNormalImg);  //3D면 보통 화면 이미지로
@@ -750,5 +752,191 @@ public class Screen extends JFrame{
 		rankingPanel.add(rankingLabel);  //랭킹 화면 라벨
 		add(rankingPanel);
 		rankingPanel.setVisible(false);
+	}
+	
+	//점수 패널 만드는 메서드           퍼펙트           굿          배드      콤보 수        점수 
+	public void generateScore(int perfect, int good, int bad, int combo, int score) {
+		ImageIcon albumImg = new ImageIcon(imagePath +musicList.get(musicIndex).getTitle()+"_Ranking.png");  //해당 노래 앨범 이미지
+		ImageIcon clickRankingButtonImg = new ImageIcon(imagePath + "Click_Ranking_Button.png");  //돌아가기 버튼 클릭 이미지
+
+		JLabel scoreScreenLabel = new JLabel(new ImageIcon(imagePath + "Score_Screen.png"));  //점수 화면 이미지 라벨
+		JLabel albumLabel = new JLabel(albumImg);  //앨범 이미지 라벨
+		JLabel perfectLabel = new JLabel("PERFECT");  //Perfect 라벨
+		JLabel goodLabel = new JLabel("GOOD");  //Good 라벨
+		JLabel badLabel = new JLabel("BAD");  //Bad 라벨
+		JLabel comboLabel = new JLabel("COMBO");  //Combo 라벨
+		JLabel titleLabel = new JLabel(musicList.get(musicIndex).getTitle());  //노래 제목 라벨
+		JLabel singerLabel = new JLabel(musicList.get(musicIndex).getSinger());  //노래 가수 라벨
+		JLabel rhythmNoteLabel = new JLabel("리듬노트");  //리듬노트 라벨
+		JLabel perfectScoreLabel = new JLabel(String.valueOf(perfect));  //Perfect 수 라벨
+		JLabel goodScoreLabel = new JLabel(String.valueOf(good));  //Good 수 라벨
+		JLabel badScoreLabel = new JLabel(String.valueOf(bad));  //Bad 수 라벨
+		JLabel comboScoreLabel = new JLabel(String.valueOf(combo));  //Combo 수 라벨
+		JLabel rankingLabel = new JLabel("순위");  //순위 라벨
+		JLabel userRankingLabel = new JLabel();  //플레이어 순위 라벨
+		JLabel scoreLabel = new JLabel("총점수");  //총점수 라벨
+		JLabel userScoreLabel = new JLabel(String.valueOf(score)+"점");  //플레이어 점수 라벨
+		JLabel userNameLabel = new JLabel(user.getNickName()+"의");  //플레이어 이름 라벨
+		
+		JButton backButton = new JButton("돌아가기",new ImageIcon(imagePath + "Ranking_Button.png"));  //돌아가기 버튼
+		
+		Font rhythmNoteFont = new Font("TDTDTadakTadak",Font.PLAIN,80);   //리듬노트 폰트
+		Font titleFont = new Font("TDTDTadakTadak",Font.PLAIN,70);   //제목 폰트
+		Font singerFont = new Font("TDTDTadakTadak",Font.PLAIN,55);   //가수 폰트
+		Font judgeFont = new Font("TDTDTadakTadak",Font.PLAIN,75);   //perfect, good, bad, combo 폰트
+		Font scoreFont = new Font("TDTDTadakTadak",Font.PLAIN,85);   //점수 폰트
+		
+		//DB
+		DB db = new DB();
+		db.connect();
+		String sql;
+		String table = "";
+		int ranking = 1;  //순위
+		
+		//테이블 구하기
+		switch(musicList.get(musicIndex).getTitle()) {
+		case "NIGHT DANCER" : table = "ranking_night_dancer"; break;
+		case "3D" : table = "ranking_3d"; break;
+		case "ETA" : table = "ranking_eta"; break;
+		}
+		
+		//점수와 닉네임을 DB에 저장 or 업데이트
+		sql = "SELECT * FROM " + table + " WHERE user = '" + user.getNickName() + "'";
+		try {
+		    ResultSet resultSet = db.stmt.executeQuery(sql);
+
+		    if (resultSet.next()) {
+		        // 이미 플레이어가 존재하면 점수 UPDATE
+		        if (!(resultSet.getInt("score") > score)) {  
+		            sql = "UPDATE " + table + " SET score = '" + score + "' WHERE user = '" + user.getNickName() + "'";
+		            db.stmt.executeUpdate(sql);
+		        }
+		    } else {
+		        // 플레이어가 존재하지 않으면 점수 INSERT
+		        sql = "INSERT INTO " + table + " (user, score) VALUES ('" + user.getNickName() + "', '" + score + "')";
+		        db.stmt.executeUpdate(sql);
+		    }
+		} catch (SQLException e) {
+		    e.printStackTrace();
+		}
+		
+		//순위 구하기
+		sql = "SELECT * FROM "+ table +" ORDER BY score DESC";  //점수를 기준으로 오름차순하는 sql문
+		ResultSet result;
+		
+		try {
+			result = db.stmt.executeQuery(sql);
+			while (result.next()) {
+				if(result.getInt("score")<=score)  //점수가 높으면 break
+					break;
+				else if(result.getString("user").equals(user.getNickName()))   //본인 원래 순위 제외
+					continue;
+				else
+					ranking++;  //순위 증가
+		    }
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		db.closeConnection();
+		
+		/*set*/
+		scorePanel.setLayout(null);
+		scoreScreenLabel.setBounds(0, 0, FRAME_WIDTH, FRAME_HEIGHT);  //점수 화면 라벨
+		
+		albumLabel.setBounds(-10,70,FRAME_WIDTH,FRAME_HEIGHT);  //앨범 이미지 라벨
+		
+		//Perfect 라벨
+		perfectLabel.setFont(judgeFont);
+		perfectLabel.setForeground(Color.WHITE);
+		perfectLabel.setBounds(745,260,300,100);
+		//Good 라벨
+		goodLabel.setFont(judgeFont);
+		goodLabel.setForeground(Color.WHITE);
+		goodLabel.setBounds(785, 370, 300, 100);
+		//Bad 라벨
+		badLabel.setFont(judgeFont);
+		badLabel.setForeground(Color.WHITE);
+		badLabel.setBounds(815, 480, 300, 100);
+		//Combo 라벨
+		comboLabel.setFont(judgeFont);
+		comboLabel.setForeground(Color.WHITE);
+		comboLabel.setBounds(775, 590, 300, 100);
+		//총 점수 라벨
+		scoreLabel.setFont(scoreFont);
+		scoreLabel.setBounds(460,740,200,100);
+		//순위 라벨
+		rankingLabel.setFont(scoreFont);
+		rankingLabel.setBounds(1000,740,200,100);
+		//Perfect 수 라벨
+		perfectScoreLabel.setFont(scoreFont);
+		perfectScoreLabel.setBounds(1080,260,200,100);
+		//Good 수 라벨
+		goodScoreLabel.setFont(scoreFont);
+		goodScoreLabel.setBounds(1080,370,200,100);
+		//Bad 수 라벨
+		badScoreLabel.setFont(scoreFont);
+		badScoreLabel.setBounds(1080,480,200,100);
+		//Combo 수 라벨
+		comboScoreLabel.setFont(scoreFont);
+		comboScoreLabel.setBounds(1080,590,200,100);
+		//플레이어 점수 라벨
+		userScoreLabel.setFont(scoreFont);
+		userScoreLabel.setBounds(670,740,400,100);
+		//플레이어 순위 라벨
+		userRankingLabel.setText(ranking+"위");
+		userRankingLabel.setFont(scoreFont);
+		userRankingLabel.setBounds(1190,740,400,100);
+		//제목 라벨
+		titleLabel.setFont(titleFont);  //폰트 설정
+		FontMetrics titleFontMetrics = titleLabel.getFontMetrics(titleLabel.getFont());
+		int titleWidth = titleFontMetrics.stringWidth(titleLabel.getText());  //제목 길이 구함
+		titleLabel.setBounds(320 - (titleWidth/2), 220, titleWidth, 100);
+		//가수 라벨
+		singerLabel.setFont(singerFont);  //폰트 설정
+		FontMetrics singerFontMetrics = singerLabel.getFontMetrics(singerLabel.getFont());
+		int singerWidth = singerFontMetrics.stringWidth(singerLabel.getText());  //가수 길이 구함
+		singerLabel.setBounds(320 - (singerWidth/2), 270, singerWidth+100, 100);
+		//리듬노트 라벨
+		rhythmNoteLabel.setFont(rhythmNoteFont);
+		rhythmNoteLabel.setBounds(580, 90, 300, 100);
+		//플레이어 이름 라벨
+		userNameLabel.setFont(rhythmNoteFont);
+		FontMetrics nameFontMetrics = titleLabel.getFontMetrics(userNameLabel.getFont());
+		int nameWidth = nameFontMetrics.stringWidth(userNameLabel.getText());  //이름 길이 구함
+		userNameLabel.setBounds((FRAME_WIDTH/2)-(nameWidth/2), 10, nameWidth, 100);
+		//돌아가기 버튼
+		backButton.setBounds(1050,0,320,80);
+		transparencyButton(backButton);  //버튼 투명하게
+		backButton.setFont(buttonFont);  //폰트 설정
+		backButton.setHorizontalTextPosition(JButton.CENTER);
+		backButton.setRolloverIcon(clickRankingButtonImg);  //호버링시 이미지 변경
+		
+		/*add*/
+		backButton.addActionListener(e->{
+			scorePanel.setVisible(false);  //점수 화면 숨김
+			generateSelectSong();  //노래 선택 화면 생성
+			selectSongPanel.setVisible(true);
+		});
+		scorePanel.add(backButton);  //돌아가기 버튼
+		scorePanel.add(userRankingLabel);  //플레이어 순위 라벨
+		scorePanel.add(userScoreLabel);  //플레이어 점수 라벨
+		scorePanel.add(userNameLabel);  //플레이어 이름 라벨
+		scorePanel.add(comboScoreLabel);  //콤보 수 라벨
+		scorePanel.add(rankingLabel);  //순위 라벨
+		scorePanel.add(scoreLabel);  //점수 라벨
+		scorePanel.add(badScoreLabel);  //Bad 수 라벨
+		scorePanel.add(goodScoreLabel);  //Good 수 라벨
+		scorePanel.add(perfectScoreLabel);  //Perfect 수 라벨
+		scorePanel.add(rhythmNoteLabel);  //리듬노트 라벨
+		scorePanel.add(titleLabel);  //제목 라벨
+		scorePanel.add(singerLabel);  //가수 라벨
+		scorePanel.add(perfectLabel);  //PERFECT 라벨
+		scorePanel.add(goodLabel);  //GOOD 라벨
+		scorePanel.add(badLabel);  //BAD 라벨
+		scorePanel.add(comboLabel);  //COMBO 라벨
+		scorePanel.add(albumLabel);  //앨범 이미지 라벨
+		scorePanel.add(scoreScreenLabel);  //점수 화면 라벨
+		add(scorePanel);
+		scorePanel.setVisible(false);
 	}
 }
