@@ -188,7 +188,9 @@ public class Screen extends JFrame{
 		Font font2 = new Font("TDTDTadakTadak",Font.PLAIN,120);  // 조금 작은 폰트
 		Font textFont = new Font("TDTDTadakTadak",Font.PLAIN,60);  //텍스트 필드용 폰트
 		Font guideFont = new Font("TDTDTadakTadak",Font.PLAIN,40);  //비번 불일치 안내 폰트
+		
 		JButton OKButton = new JButton("로그인!",new ImageIcon(imagePath+"Button.png"));  //확인 버튼
+		JButton backButton = new JButton("뒤로가기",new ImageIcon(imagePath + "Ranking_Button.png"));  //뒤로가기 버튼
 		
 		/*set*/
 		signInPanel.setLayout(null);  //로그인 화면 패널
@@ -219,6 +221,13 @@ public class Screen extends JFrame{
 		noPasswordLabel.setFont(guideFont);
 		noPasswordLabel.setBounds(200, 600, 1000, 100);
 		noPasswordLabel.setVisible(false);
+		//뒤로가기 버튼
+		backButton.setFont(buttonFont);
+		backButton.setBounds(30,0,320,75);
+		backButton.setRolloverIcon(new ImageIcon(imagePath + "Click_Ranking_Button.png"));  //호버링시 이미지 변경
+		transparencyButton(backButton);  //버튼 투명하게
+		backButton.setHorizontalTextPosition(JButton.CENTER);
+		
 		/*add*/
 		signInPanel.add(noPasswordLabel);  //불일치 안내 라벨
 		signInPanel.add(signInText);  //로그인 텍스트 라벨
@@ -231,6 +240,13 @@ public class Screen extends JFrame{
 			doSignIn();  //로그인 기능
 		});
 		
+		backButton.addActionListener(e->{
+			signInPanel.setVisible(false);  //로그인 화면 숨김
+			 signInPanel.removeAll();  //로그인 패널 삭제
+			startPanel.setVisible(true);  //시작화면 보이게
+		});
+		
+		signInPanel.add(backButton);  //뒤로가기 버튼
 		signInPanel.add(OKButton);  //확인 버튼
 		signInPanel.add(signInScreenLabel);
 		add(signInPanel);
@@ -288,6 +304,7 @@ public class Screen extends JFrame{
 		Font guideFont = new Font("TDTDTadakTadak",Font.PLAIN,40);  //불일치 안내 폰트
 		
 		JButton OKButton = new JButton("회원가입!",new ImageIcon(imagePath+"Button.png"));  //확인 버튼
+		JButton backButton = new JButton("뒤로가기",new ImageIcon(imagePath + "Ranking_Button.png"));  //뒤로가기 버튼
 		
 		/*set*/
 		signUpPanel.setLayout(null);  //회원가입 화면 패널
@@ -320,6 +337,13 @@ public class Screen extends JFrame{
 		OKButton.setHorizontalTextPosition(JButton.CENTER);
 		OKButton.setRolloverIcon(clickButtonImg);  //호버링시 이미지 변경
 		transparencyButton(OKButton);  //버튼 투명하게
+		//뒤로가기 버튼
+		backButton.setFont(buttonFont);
+		backButton.setBounds(30,0,320,75);
+		backButton.setRolloverIcon(new ImageIcon(imagePath + "Click_Ranking_Button.png"));  //호버링시 이미지 변경
+		transparencyButton(backButton);  //버튼 투명하게
+		backButton.setHorizontalTextPosition(JButton.CENTER);
+		
 		//중복 닉네임 안내 라벨
 		overlapNicknameLabel.setFont(guideFont);
 		overlapNicknameLabel.setBounds(200, 610, 1000, 100);
@@ -333,6 +357,13 @@ public class Screen extends JFrame{
 		OKButton.addActionListener(e->{
 			doSignUp();  //회원가입 기능
 		});
+
+		backButton.addActionListener(e->{
+			signUpPanel.setVisible(false);  //회원가입 화면 숨김
+			signUpPanel.removeAll();  //회원가입 패널 삭제
+			startPanel.setVisible(true);  //시작화면 보이게
+		});
+		
 		signUpPanel.add(signUpText);  //로그인 텍스트 라벨
 		signUpPanel.add(nickNameText);  //닉네임 텍스트 라벨
 		signUpPanel.add(passwordText);  //비번 텍스트 라벨
@@ -343,7 +374,8 @@ public class Screen extends JFrame{
 		signUpPanel.add(overlapNicknameLabel);  //중복 닉네임 안내 라벨
 		signUpPanel.add(checkPasswordLabel);  //비번 불일치 안내 라벨
 		signUpPanel.add(OKButton);  //확인 버튼
-		signUpPanel.add(signUpScreenLabel);
+		signUpPanel.add(backButton);  //뒤로가기 버튼
+		signUpPanel.add(signUpScreenLabel);  //회원가입 화면 라벨
 		add(signUpPanel);
 		signUpPanel.setVisible(false);
 	}
@@ -914,7 +946,7 @@ public class Screen extends JFrame{
 		/*add*/
 		backButton.addActionListener(e->{
 			scorePanel.setVisible(false);  //점수 화면 숨김
-			generateSelectSong();  //노래 선택 화면 생성
+			scorePanel.removeAll();  //점수 화면 패널 삭제
 			selectSongPanel.setVisible(true);
 		});
 		scorePanel.add(backButton);  //돌아가기 버튼
