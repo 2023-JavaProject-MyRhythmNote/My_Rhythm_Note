@@ -914,7 +914,7 @@ public class Screen extends JFrame{
 		/*add*/
 		backButton.addActionListener(e->{
 			scorePanel.setVisible(false);  //점수 화면 숨김
-			generateSelectSong();  //노래 선택 화면 생성
+			scorePanel.removeAll();  //점수 화면 패널 삭제
 			selectSongPanel.setVisible(true);
 		});
 		scorePanel.add(backButton);  //돌아가기 버튼
