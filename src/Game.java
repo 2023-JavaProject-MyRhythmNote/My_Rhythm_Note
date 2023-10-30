@@ -120,7 +120,7 @@ public class Game extends Thread{
 		}
 
 	    missNote(830);  //노트의 y 좌표가 830을 넘어가면 삭제되도록 함
-	    
+		
 		//키보드 눌렀을때 효과
 		g.drawImage(EffectBar_S, 80, 200, 200, 700,null);
 		g.drawImage(EffectBar_D, 290, 195, 200, 700,null);
@@ -299,17 +299,14 @@ public class Game extends Thread{
 		        	combo = 0;  //콤보 수 초기화
 		        	countBad++;  //배드 수 증가
 		        }
+		        
 		        noteArrayList.remove(i);  //노트 arrayList에서 삭제
 		        judgmentTimer.restart();
 		        
 		        if(combo>bestCombo) bestCombo = combo;  //최고 콤보 수 업데이트
 		        
-				if(noteArrayList.isEmpty()) {  //게임이 끝나면 점수 화면으로 이동
-					Main.screen.isGame = false;  //이제 게임 아님
-					mp3.stop();  //test
-					Main.screen.generateScore(countPerfect,countGood,countBad,bestCombo,score);  //점수 화면 생성
-					Main.screen.scorePanel.setVisible(true);  //점수 화면 패널 보이게
-				}
+		        goScoreScreen();
+		        
 	            break;  //노트 중복 삭제 안되도록 
 			}
 	    }
@@ -326,9 +323,19 @@ public class Game extends Thread{
 	            combo = 0; //콤보 수 초기화
 	            i--; // 노트를 제거했으므로 인덱스를 하나 줄임
 	        }
+	        goScoreScreen();
 	    }
 	}
 	
+	//점수 화면으로 이동하는 메서드
+	public void goScoreScreen() {
+		if(noteArrayList.isEmpty()) {  //게임이 끝나면 점수 화면으로 이동
+			Main.screen.isGame = false;  //이제 게임 아님
+			mp3.stop();  //test
+			Main.screen.generateScore(countPerfect,countGood,countBad,bestCombo,score);  //점수 화면 생성
+			Main.screen.scorePanel.setVisible(true);  //점수 화면 패널 보이게
+		}
+	}
 	//Pressed
 	public void pressed_S() {
 		EffectBar_S = new ImageIcon(imagePath+"EffectBar_S.png").getImage();
