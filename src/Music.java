@@ -1,5 +1,5 @@
 
-public class Music {
+public class Music extends Thread{
 	private String singer;  //가수
 	private String title;  //제목
 	static Music music;
@@ -8,7 +8,6 @@ public class Music {
 		this.singer = singer;
 		this.title = title;
 	}
-	
 	//Getter Setter
 	public String getSinger() {
 		return singer;

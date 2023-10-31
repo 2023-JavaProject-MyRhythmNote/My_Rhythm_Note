@@ -8,7 +8,7 @@ public class Note extends Thread{
 	String imagePath = System.getProperty("user.dir")+"/src/images/";  //이미지 상대 경로
 	Image noteImage = new ImageIcon(imagePath+"Note.png").getImage();  //노트 이미지
 	int x;  //노트의 x 위치
-	int y = 740-(1000 / Main.SLEEP_TIME * Main.NOTE_SPEED* Main.REACH_TIME);  //노트의 y 위치
+	int y = 100;  //노트의 y 위치
 	String noteType;  //노트의 타입
 	int startTime;  //노트가 나오는 시간
     

@@ -49,7 +49,7 @@ public class Game extends Thread{
 	Image noteK = new ImageIcon(imagePath+"Note_K.png").getImage();
 	Image noteL = new ImageIcon(imagePath+"Note_L.png").getImage();
 	
-	Timer judgmentTimer; //노트 판정 효과 타이머
+	Timer judgementTimer; //노트 판정 효과 타이머
 	
 	//판정 이미지
 	Image perfect;
@@ -57,7 +57,7 @@ public class Game extends Thread{
 	Image bad;
 	
 	public Game() {
-		mp3.play(musicPath+Music.music.getTitle()+".mp3");  //노래 재생 시작
+		start();
 		score = 0;  //점수 초기화
 		countPerfect = 0;  //퍼펙트 초기화
 		countGood = 0;  //굿 초기화
@@ -66,7 +66,7 @@ public class Game extends Thread{
 		bestCombo = 0;  //최고 콤보 초기화
 		
 		//노트 판정 효과 나오는 시간 조절
-	    judgmentTimer = new Timer(70, new ActionListener() {
+	    judgementTimer = new Timer(70, new ActionListener() {
 	        @Override
 	        public void actionPerformed(ActionEvent e) {
 	            perfect = null;
@@ -74,7 +74,7 @@ public class Game extends Thread{
 	            bad = null;
 	        }
 	    });
-	    judgmentTimer.setRepeats(false); // 타이머가 한 번만 실행되도록 설정
+	    judgementTimer.setRepeats(false); // 타이머가 한 번만 실행되도록 설정
 	}
 	
 	//게임 화면 그리기
@@ -147,56 +147,28 @@ public class Game extends Thread{
 			double beatDuration = 60.0 / bpm; // 1 비트당 시간 (초 단위)
 			int noteDuration = (int) (beatDuration * 1000); // 1 비트당 시간 (밀리초 단위)
 			notelist = new NoteList[]{
-				    new NoteList("S", noteDuration),
-				    new NoteList("D", noteDuration * 2),
-				    new NoteList("F", noteDuration * 4),
-				    new NoteList("D", noteDuration * 7),
-//				    new NoteList("S", noteDuration * 8),
-//				    new NoteList("S", noteDuration * 10),
-//				    new NoteList("K", noteDuration * 12),
-//				    new NoteList("F", noteDuration * 15),
-//				    new NoteList("S", noteDuration * 18),
-//				    new NoteList("K", noteDuration * 20),
-//				    new NoteList("S", noteDuration * 24),
-//				    new NoteList("J", noteDuration * 28),
-//				    new NoteList("J", noteDuration * 32),
-//				    new NoteList("S", noteDuration * 38),
-//				    new NoteList("L", noteDuration * 42),
-//				    new NoteList("J", noteDuration * 46),
-//				    new NoteList("J", noteDuration * 50),
-//				    new NoteList("S", noteDuration * 54),
-//				    new NoteList("D", noteDuration * 58),
-//				    new NoteList("F", noteDuration * 62),
-//				    new NoteList("K", noteDuration * 66),
-//				    new NoteList("F", noteDuration * 70),
-//				    new NoteList("S", noteDuration * 74),
-//				    new NoteList("K", noteDuration * 78),
-//				    new NoteList("K", noteDuration * 82),
-//				    new NoteList("L", noteDuration * 86),
-//				    new NoteList("K", noteDuration * 90),
-//				    new NoteList("J", noteDuration * 94),
-//				    new NoteList("D", noteDuration * 98),
-//				    new NoteList("J", noteDuration * 102),
-//				    new NoteList("J", noteDuration * 106),
-//				    new NoteList("F", noteDuration * 110),
-//				    new NoteList("L", noteDuration * 114),
-//				    new NoteList("K", noteDuration * 118),
-//				    new NoteList("J", noteDuration * 122),
-//				    new NoteList("S", noteDuration * 126),
-//				    new NoteList("L", noteDuration * 130),
-//				    new NoteList("D", noteDuration * 134),
-//				    new NoteList("F", noteDuration * 138),
-//				    new NoteList("K", noteDuration * 142),
-//				    new NoteList("F", noteDuration * 146),
-//				    new NoteList("S", noteDuration * 150),
-//				    new NoteList("K", noteDuration * 154),
-//				    new NoteList("K", noteDuration * 158),
-//				    new NoteList("L", noteDuration * 162),
-//				    new NoteList("K", noteDuration * 166),
-//				    new NoteList("J", noteDuration * 170),
-//				    new NoteList("D", noteDuration * 174),
-//				    new NoteList("J", noteDuration * 178),
-//				    new NoteList("J", noteDuration * 182)
+				    new NoteList("F", noteDuration * 2), new NoteList("K", noteDuration * 5),
+				    new NoteList("D", noteDuration * 6), new NoteList("S", noteDuration * 8),
+				    new NoteList("L", noteDuration * 9), new NoteList("S", noteDuration * 10),
+				    new NoteList("K", noteDuration * 12), new NoteList("F", noteDuration * 13),
+				    new NoteList("J", noteDuration * 14), new NoteList("L", noteDuration * 15),
+				    new NoteList("S", noteDuration * 18), new NoteList("K", noteDuration * 20),
+				    new NoteList("L", noteDuration * 22), new NoteList("S", noteDuration * 24),
+				    new NoteList("J", noteDuration * 27), new NoteList("D", noteDuration * 30),
+				    new NoteList("J", noteDuration * 32), new NoteList("F", noteDuration * 34),
+				    new NoteList("S", noteDuration * 38), new NoteList("K", noteDuration * 40),
+				    new NoteList("L", noteDuration * 42), new NoteList("K", noteDuration * 45),
+				    new NoteList("J", noteDuration * 46), new NoteList("K", noteDuration * 47),
+				    new NoteList("J", noteDuration * 50), new NoteList("L", noteDuration * 51),
+				    new NoteList("S", noteDuration * 54), new NoteList("F", noteDuration * 56),
+				    new NoteList("D", noteDuration * 58), new NoteList("S", noteDuration * 60),
+				    new NoteList("F", noteDuration * 62), new NoteList("F", noteDuration * 65),
+				    new NoteList("K", noteDuration * 66), new NoteList("L", noteDuration * 68),
+				    new NoteList("F", noteDuration * 70), new NoteList("D", noteDuration * 72),
+				    new NoteList("S", noteDuration * 74), new NoteList("L", noteDuration * 77),
+				    new NoteList("K", noteDuration * 78), new NoteList("J", noteDuration * 79),
+				    new NoteList("K", noteDuration * 82), new NoteList("L", noteDuration * 86),
+				    new NoteList("K", noteDuration * 90), new NoteList("S", noteDuration * 92)
 				};
 		}else if(Music.music.getTitle().equals("3D")) {
 			int bpm = 125; // 노래의 BPM
@@ -301,7 +273,7 @@ public class Game extends Thread{
 		        }
 		        
 		        noteArrayList.remove(i);  //노트 arrayList에서 삭제
-		        judgmentTimer.restart();
+		        judgementTimer.restart();
 		        
 		        if(combo>bestCombo) bestCombo = combo;  //최고 콤보 수 업데이트
 		        
@@ -318,7 +290,7 @@ public class Game extends Thread{
 	        if (note.getY() >= missY) {  //미스 라인을 지나면
 	        	noteArrayList.remove(i);
 	        	bad = new ImageIcon(imagePath+"Bad.png").getImage();  //배드 효과
-	        	judgmentTimer.restart();
+	        	judgementTimer.restart();
 	            countBad++;  //배드 수 증가
 	            combo = 0; //콤보 수 초기화
 	            i--; // 노트를 제거했으므로 인덱스를 하나 줄임
@@ -330,10 +302,17 @@ public class Game extends Thread{
 	//점수 화면으로 이동하는 메서드
 	public void goScoreScreen() {
 		if(noteArrayList.isEmpty()) {  //게임이 끝나면 점수 화면으로 이동
-			Main.screen.isGame = false;  //이제 게임 아님
-			mp3.stop();  //test
-			Main.screen.generateScore(countPerfect,countGood,countBad,bestCombo,score);  //점수 화면 생성
-			Main.screen.scorePanel.setVisible(true);  //점수 화면 패널 보이게
+			Timer timer = new Timer(2000, new ActionListener() {
+		        @Override
+		        public void actionPerformed(ActionEvent e) {
+		        	Main.screen.isGame = false;  //이제 게임 아님
+					mp3.stop();  //test
+					Main.screen.generateScore(countPerfect,countGood,countBad,bestCombo,score);  //점수 화면 생성
+					Main.screen.scorePanel.setVisible(true);  //점수 화면 패널 보이게
+		        }
+			});
+			timer.setRepeats(false);
+			timer.start();
 		}
 	}
 	//Pressed

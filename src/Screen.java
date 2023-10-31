@@ -622,8 +622,8 @@ public class Screen extends JFrame{
 			Music.music = new Music(musicList.get(musicIndex).getSinger(),musicList.get(musicIndex).getTitle());  //노래 설정
 			selectSongPanel.setVisible(false);  //노래 선택 화면 숨김
 			isGame = true;  //게임이다.
-			game = new Game();  
-			game.start();  //게임 시작
+			game = new Game();
+			game.mp3.play(musicPath+musicList.get(musicIndex).getTitle()+".mp3");  //노래 재생 시작
 			setLocation(1000, 1000);  //윈도우 창 멀리 보내버림
 			setLocationRelativeTo(null);  //윈도우 창 다시 정중앙에
 		});
