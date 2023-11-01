@@ -624,6 +624,11 @@ public class Screen extends JFrame{
 		selectButton.addActionListener(e->{
 			highlightPlayer.stop();  //하이라이트 재생 멈춤
 			Music.music = new Music(musicList.get(musicIndex).getSinger(),musicList.get(musicIndex).getTitle());  //노래 설정
+			try {
+				Thread.sleep(450);  //잠시 멈춤
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
+			}
 			selectSongPanel.setVisible(false);  //노래 선택 화면 숨김
 			isGame = true;  //게임이다.
 			game = new Game();
