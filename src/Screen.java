@@ -30,7 +30,9 @@ public class Screen extends JFrame{
 	private final int FRAME_HEIGHT = 900;  //세로 크기
 	int musicIndex = 0;  //노래 인덱스
 	
+	String musicPath = System.getProperty("user.dir")+"/src/musics/";  //음악 상대 경로
 	String imagePath = System.getProperty("user.dir")+"/src/images/";  //이미지 상대 경로
+	
 	ImageIcon startImg = new ImageIcon(imagePath + "Start_Screen.png"); //시작화면 이미지
 	ImageIcon clickButtonImg = new ImageIcon(imagePath + "Click_Button.png");  //버튼 클릭 이미지
 	
@@ -421,7 +423,7 @@ public class Screen extends JFrame{
 			db.stmt.executeUpdate(sql);
 			signUpSuccess = true;  //회원가입 성공
 		} catch (SQLException e) {
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 		}
 		db.closeConnection(); // db 연결 해제
 		
@@ -511,7 +513,7 @@ public class Screen extends JFrame{
 	
 	//노래 선택 패널 만드는 메서드
 	public void generateSelectSong() {
-		String musicPath = System.getProperty("user.dir")+"/src/musics/";  //음악 상대 경로
+		MP3Player effect = new MP3Player();  //효과음
 		
 		ImageIcon selectSongImg = new ImageIcon(imagePath + "SelectSong_Screen.png");  //노래 선택 화면 이미지
 		ImageIcon clickRightButtonImg = new ImageIcon(imagePath + "Click_Right_Button.png");  //오른쪽 버튼 클릭 이미지
@@ -580,6 +582,12 @@ public class Screen extends JFrame{
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				if(highlightPlayer.isPlaying()) {  //이전 노래가 재생중이라면
+					highlightPlayer.stop();  //노래 정지
+				}
+				
+				effect.play(musicPath+"Paper_Effect.mp3");  //종이 넘기는 효과음 재생
+				
 				if(e.getActionCommand().equals("오른쪽")) {
 					if(musicIndex<musicList.size()-1)  //노래 리스트 길이보다 작다면 인덱스 증가
 						musicIndex++;
@@ -592,9 +600,6 @@ public class Screen extends JFrame{
 				singerLabel.setText(musicList.get(musicIndex).getSinger());  //노래 가수 교체
 				albumLabel.setIcon(albumChangeImg);  //앨범 커버 이미지 교체
 
-				if(highlightPlayer.isPlaying()) {  //이전 노래가 재생중이라면
-					highlightPlayer.stop();  //노래 정지
-				}
 				
 				//노래 끊기는 게 어색해서 넣음
 				try {
@@ -620,10 +625,14 @@ public class Screen extends JFrame{
 		selectButton.addActionListener(e->{
 			highlightPlayer.stop();  //하이라이트 재생 멈춤
 			Music.music = new Music(musicList.get(musicIndex).getSinger(),musicList.get(musicIndex).getTitle());  //노래 설정
+			try {
+				Thread.sleep(450);  //잠시 멈춤
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
+			}
 			selectSongPanel.setVisible(false);  //노래 선택 화면 숨김
 			isGame = true;  //게임이다.
-			game = new Game();  
-			game.start();  //게임 시작
+			game = new Game();
 			setLocation(1000, 1000);  //윈도우 창 멀리 보내버림
 			setLocationRelativeTo(null);  //윈도우 창 다시 정중앙에
 		});
@@ -788,6 +797,10 @@ public class Screen extends JFrame{
 	
 	//점수 패널 만드는 메서드           퍼펙트           굿          배드      콤보 수        점수 
 	public void generateScore(int perfect, int good, int bad, int combo, int score) {
+		MP3Player effect = new MP3Player();  //효과음
+		
+		effect.play(musicPath + "Paper_Effect.mp3");  //종이 넘기는 효과음 재생
+		
 		ImageIcon albumImg = new ImageIcon(imagePath +musicList.get(musicIndex).getTitle()+"_Ranking.png");  //해당 노래 앨범 이미지
 		ImageIcon clickRankingButtonImg = new ImageIcon(imagePath + "Click_Ranking_Button.png");  //돌아가기 버튼 클릭 이미지
 
@@ -862,7 +875,7 @@ public class Screen extends JFrame{
 				if(result.getInt("score")<=score)  //점수가 높으면 break
 					break;
 				else if(result.getString("user").equals(user.getNickName()))   //본인 원래 순위 제외
-					continue;
+					ranking++;  //순위 증가
 				else
 					ranking++;  //순위 증가
 		    }

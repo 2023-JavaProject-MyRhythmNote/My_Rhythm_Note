@@ -1,5 +1,5 @@
 
-public class Music {
+public class Music extends Thread{
 	private String singer;  //가수
 	private String title;  //제목
 	static Music music;

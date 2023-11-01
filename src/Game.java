@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
@@ -49,7 +50,7 @@ public class Game extends Thread{
 	Image noteK = new ImageIcon(imagePath+"Note_K.png").getImage();
 	Image noteL = new ImageIcon(imagePath+"Note_L.png").getImage();
 	
-	Timer judgmentTimer; //노트 판정 효과 타이머
+	Timer judgementTimer; //노트 판정 효과 타이머
 	
 	//판정 이미지
 	Image perfect;
@@ -57,16 +58,18 @@ public class Game extends Thread{
 	Image bad;
 	
 	public Game() {
-		mp3.play(musicPath+Music.music.getTitle()+".mp3");  //노래 재생 시작
-		score = 0;  //점수 초기화
-		countPerfect = 0;  //퍼펙트 초기화
-		countGood = 0;  //굿 초기화
-		countBad = 0;  //배드 초기화
-		combo = 0;  //콤보 초기화
-		bestCombo = 0;  //최고 콤보 초기화
-		
+	    //3초 대기
+	    Timer startGameTimer = new Timer(3000, new ActionListener() {
+	        @Override
+	        public void actionPerformed(ActionEvent e) {
+	            mp3.play(musicPath + Music.music.getTitle() + ".mp3");  //노래 시작
+	            start();  //시작
+	        }
+	    });
+	    startGameTimer.setRepeats(false); // 타이머가 한 번만 실행되도록 설정
+	    startGameTimer.restart(); // 타이머 시작
 		//노트 판정 효과 나오는 시간 조절
-	    judgmentTimer = new Timer(70, new ActionListener() {
+	    judgementTimer = new Timer(70, new ActionListener() {
 	        @Override
 	        public void actionPerformed(ActionEvent e) {
 	            perfect = null;
@@ -74,7 +77,7 @@ public class Game extends Thread{
 	            bad = null;
 	        }
 	    });
-	    judgmentTimer.setRepeats(false); // 타이머가 한 번만 실행되도록 설정
+	    judgementTimer.setRepeats(false); // 타이머가 한 번만 실행되도록 설정
 	}
 	
 	//게임 화면 그리기
@@ -140,126 +143,335 @@ public class Game extends Thread{
 	
 	//노트를 내려오게 하는 메서드
 	public void dropNote() {
-		NoteList[] notelist = null;  //노트 리스트에서 노트 찍기
+		NoteList[] notelist = null;  //노트 리스트
 		
 		if(Music.music.getTitle().equals("NIGHT DANCER")) {
+			Main.NOTE_SPEED = 7;  //노트 스피드 설정
 			int bpm = 117; // 노래의 BPM
 			double beatDuration = 60.0 / bpm; // 1 비트당 시간 (초 단위)
 			int noteDuration = (int) (beatDuration * 1000); // 1 비트당 시간 (밀리초 단위)
 			notelist = new NoteList[]{
-				    new NoteList("S", noteDuration),
-				    new NoteList("D", noteDuration * 2),
-				    new NoteList("F", noteDuration * 4),
-				    new NoteList("D", noteDuration * 7),
-//				    new NoteList("S", noteDuration * 8),
-//				    new NoteList("S", noteDuration * 10),
-//				    new NoteList("K", noteDuration * 12),
-//				    new NoteList("F", noteDuration * 15),
-//				    new NoteList("S", noteDuration * 18),
-//				    new NoteList("K", noteDuration * 20),
-//				    new NoteList("S", noteDuration * 24),
-//				    new NoteList("J", noteDuration * 28),
-//				    new NoteList("J", noteDuration * 32),
-//				    new NoteList("S", noteDuration * 38),
-//				    new NoteList("L", noteDuration * 42),
-//				    new NoteList("J", noteDuration * 46),
-//				    new NoteList("J", noteDuration * 50),
-//				    new NoteList("S", noteDuration * 54),
-//				    new NoteList("D", noteDuration * 58),
-//				    new NoteList("F", noteDuration * 62),
-//				    new NoteList("K", noteDuration * 66),
-//				    new NoteList("F", noteDuration * 70),
-//				    new NoteList("S", noteDuration * 74),
-//				    new NoteList("K", noteDuration * 78),
-//				    new NoteList("K", noteDuration * 82),
-//				    new NoteList("L", noteDuration * 86),
-//				    new NoteList("K", noteDuration * 90),
-//				    new NoteList("J", noteDuration * 94),
-//				    new NoteList("D", noteDuration * 98),
-//				    new NoteList("J", noteDuration * 102),
-//				    new NoteList("J", noteDuration * 106),
-//				    new NoteList("F", noteDuration * 110),
-//				    new NoteList("L", noteDuration * 114),
-//				    new NoteList("K", noteDuration * 118),
-//				    new NoteList("J", noteDuration * 122),
-//				    new NoteList("S", noteDuration * 126),
-//				    new NoteList("L", noteDuration * 130),
-//				    new NoteList("D", noteDuration * 134),
-//				    new NoteList("F", noteDuration * 138),
-//				    new NoteList("K", noteDuration * 142),
-//				    new NoteList("F", noteDuration * 146),
-//				    new NoteList("S", noteDuration * 150),
-//				    new NoteList("K", noteDuration * 154),
-//				    new NoteList("K", noteDuration * 158),
-//				    new NoteList("L", noteDuration * 162),
-//				    new NoteList("K", noteDuration * 166),
-//				    new NoteList("J", noteDuration * 170),
-//				    new NoteList("D", noteDuration * 174),
-//				    new NoteList("J", noteDuration * 178),
-//				    new NoteList("J", noteDuration * 182)
+				    new NoteList("F", noteDuration * 2), new NoteList("K", noteDuration * 5),
+				    new NoteList("D", noteDuration * 6), new NoteList("S", noteDuration * 8),
+				    new NoteList("L", noteDuration * 9), new NoteList("S", noteDuration * 10),
+				    new NoteList("K", noteDuration * 12), new NoteList("F", noteDuration * 13),
+				    new NoteList("J", noteDuration * 14), new NoteList("L", noteDuration * 15),
+				    new NoteList("S", noteDuration * 18), new NoteList("K", noteDuration * 20),
+				    new NoteList("L", noteDuration * 22), new NoteList("S", noteDuration * 24),
+				    new NoteList("J", noteDuration * 27), new NoteList("D", noteDuration * 30),
+				    new NoteList("J", noteDuration * 32), new NoteList("F", noteDuration * 34),
+				    new NoteList("S", noteDuration * 38), new NoteList("K", noteDuration * 40),
+				    new NoteList("L", noteDuration * 42), new NoteList("K", noteDuration * 45),
+				    new NoteList("J", noteDuration * 46), new NoteList("K", noteDuration * 47),
+				    new NoteList("J", noteDuration * 50), new NoteList("L", noteDuration * 51),
+				    new NoteList("S", noteDuration * 54), new NoteList("F", noteDuration * 56),
+				    new NoteList("D", noteDuration * 58), new NoteList("S", noteDuration * 60),
+				    new NoteList("F", noteDuration * 62), new NoteList("F", noteDuration * 65),
+				    new NoteList("K", noteDuration * 66), new NoteList("L", noteDuration * 68),
+				    new NoteList("F", noteDuration * 70), new NoteList("D", noteDuration * 72),
+				    new NoteList("S", noteDuration * 74), new NoteList("L", noteDuration * 77),
+				    new NoteList("K", noteDuration * 78), new NoteList("J", noteDuration * 79),
+				    new NoteList("K", noteDuration * 82), new NoteList("L", noteDuration * 86),
+				    new NoteList("K", noteDuration * 90), new NoteList("S", noteDuration * 92)
 				};
 		}else if(Music.music.getTitle().equals("3D")) {
-			int bpm = 125; // 노래의 BPM
+			Main.NOTE_SPEED = 8;  //노트 스피드 설정
+			int bpm = 107; // 노래의 BPM
 			double beatDuration = 60.0 / bpm; // 1 비트당 시간 (초 단위)
 			int noteDuration = (int) (beatDuration * 1000); // 1 비트당 시간 (밀리초 단위)
 			notelist = new NoteList[]{
-				    new NoteList("S", noteDuration * 2),new NoteList("D", noteDuration * 4),
-//				    new NoteList("D", noteDuration * 6),new NoteList("J", noteDuration * 8),
-//				    new NoteList("K", noteDuration * 10),new NoteList("D", noteDuration * 12),
-//				    new NoteList("S", noteDuration * 14),new NoteList("F", noteDuration * 16),
-//				    new NoteList("L", noteDuration * 18),new NoteList("J", noteDuration * 20),
-//				    new NoteList("K", noteDuration * 22),new NoteList("S", noteDuration * 24),
-//				    new NoteList("F", noteDuration * 26),new NoteList("D", noteDuration * 28),
-//				    new NoteList("F", noteDuration * 30),new NoteList("J", noteDuration * 32),
-//				    new NoteList("K", noteDuration * 34),new NoteList("S", noteDuration * 36),
-//				    new NoteList("S", noteDuration * 38),new NoteList("L", noteDuration * 40),
-//				    new NoteList("F", noteDuration * 42),new NoteList("J", noteDuration * 44),
-//				    new NoteList("J", noteDuration * 46),new NoteList("L", noteDuration * 48),
-//				    new NoteList("S", noteDuration * 50),new NoteList("D", noteDuration * 52),
-//				    new NoteList("K", noteDuration * 54),new NoteList("F", noteDuration * 56),
-//				    new NoteList("J", noteDuration * 58),new NoteList("L", noteDuration * 60),
-//				    new NoteList("F", noteDuration * 62),new NoteList("D", noteDuration * 64),
-//				    new NoteList("J", noteDuration * 66),new NoteList("K", noteDuration * 68),
-//				    new NoteList("S", noteDuration * 70),new NoteList("L", noteDuration * 72),
-//				    new NoteList("K", noteDuration * 74),new NoteList("S", noteDuration * 76),
-//				    new NoteList("F", noteDuration * 78),new NoteList("D", noteDuration * 80),
-//				    new NoteList("S", noteDuration * 82),new NoteList("J", noteDuration * 84),
-//				    new NoteList("D", noteDuration * 86),new NoteList("F", noteDuration * 88),
-//				    new NoteList("J", noteDuration * 90),new NoteList("L", noteDuration * 92),
-//				    new NoteList("K", noteDuration * 94),new NoteList("S", noteDuration * 96),
-//				    new NoteList("S", noteDuration * 98),new NoteList("F", noteDuration * 100),
-//				    new NoteList("D", noteDuration * 102),new NoteList("K", noteDuration * 104),
-//				    new NoteList("J", noteDuration * 106),new NoteList("L", noteDuration * 108),
-//				    new NoteList("F", noteDuration * 110),new NoteList("S", noteDuration * 112),
-//				    new NoteList("D", noteDuration * 114),new NoteList("J", noteDuration * 116),
-//				    new NoteList("K", noteDuration * 118),new NoteList("L", noteDuration * 120),
-//				    new NoteList("S", noteDuration * 122),new NoteList("F", noteDuration * 124),
-//				    new NoteList("J", noteDuration * 126),new NoteList("K", noteDuration * 128),
-//				    new NoteList("D", noteDuration * 130),new NoteList("S", noteDuration * 132),
-//				    new NoteList("F", noteDuration * 134),new NoteList("L", noteDuration * 136),
-//				    new NoteList("J", noteDuration * 138),new NoteList("K", noteDuration * 140),
-//				    new NoteList("S", noteDuration * 142),new NoteList("D", startTime + gap * 144),
-//				    new NoteList("K", startTime + gap * 146),new NoteList("F", startTime + gap * 148),
-//				    new NoteList("J", startTime + gap * 150),new NoteList("L", startTime + gap * 152),
-//				    new NoteList("S", startTime + gap * 154),new NoteList("F", startTime + gap * 156),
-//				    new NoteList("D", startTime + gap * 158),new NoteList("F", startTime + gap * 160),
-//				    new NoteList("J", startTime + gap * 162),new NoteList("K", startTime + gap * 164),
-//				    new NoteList("S", startTime + gap * 166),new NoteList("S", startTime + gap * 168),
-//				    new NoteList("L", startTime + gap * 170),new NoteList("F", startTime + gap * 172),
-//				    new NoteList("J", startTime + gap * 174), new NoteList("J", startTime + gap * 176),
-//				    new NoteList("L", startTime + gap * 178),new NoteList("S", startTime + gap * 180),
-//				    new NoteList("D", startTime + gap * 182),new NoteList("K", startTime + gap * 184),
-//				    new NoteList("F", startTime + gap * 186), new NoteList("J", startTime + gap * 188),
-//				    new NoteList("L", startTime + gap * 190),new NoteList("S", startTime + gap * 192),
-//				    new NoteList("D", startTime + gap * 194),new NoteList("K", startTime + gap * 196),
-//				    new NoteList("F", startTime + gap * 198),new NoteList("J", startTime + gap * 200)
+				    new NoteList("S", noteDuration * 2),
+				    new NoteList("D", noteDuration * 4),
+				    new NoteList("D", noteDuration * 5),
+				    new NoteList("J", noteDuration * 6),
+				    new NoteList("J", noteDuration * 7),
+				    new NoteList("L", noteDuration * 8),
+				    new NoteList("L", noteDuration * 9),
+				    new NoteList("K", noteDuration * 9 + noteDuration/2),
+				    new NoteList("D", noteDuration * 12),
+				    new NoteList("S", noteDuration * 14),
+				    new NoteList("F", noteDuration * 16),
+				    new NoteList("L", noteDuration * 18),
+				    new NoteList("J", noteDuration * 20),
+				    new NoteList("F", noteDuration * 21),
+				    new NoteList("K", noteDuration * 22),
+				    new NoteList("S", noteDuration * 23),
+				    new NoteList("F", noteDuration * 25),
+				    new NoteList("D", noteDuration * 27),
+				    new NoteList("F", noteDuration * 29),
+				    new NoteList("J", noteDuration * 31),
+				    new NoteList("D", noteDuration * 31 + noteDuration/2),
+				    new NoteList("K", noteDuration * 33),
+				    new NoteList("L", noteDuration * 34),
+				    new NoteList("S", noteDuration * 35),
+				    new NoteList("S", noteDuration * 37),
+				    new NoteList("L", noteDuration * 38 + noteDuration/2),
+				    new NoteList("F", noteDuration * 41),
+				    new NoteList("J", noteDuration * 42),
+				    new NoteList("L", noteDuration * 42 + noteDuration/2),
+				    new NoteList("K", noteDuration * 43),
+				    new NoteList("L", noteDuration * 43 + noteDuration/2),
+				    new NoteList("D", noteDuration * 44),
+				    new NoteList("L", noteDuration * 45),
+				    new NoteList("S", noteDuration * 47),
+				    new NoteList("L", noteDuration * 48),
+				    new NoteList("F", noteDuration * 49),
+				    new NoteList("D", noteDuration * 51),
+				    new NoteList("K", noteDuration * 53),
+				    new NoteList("F", noteDuration * 55),
+				    new NoteList("J", noteDuration * 57),
+				    new NoteList("L", noteDuration * 59),
+				    new NoteList("F", noteDuration * 61),
+				    new NoteList("D", noteDuration * 63),
+				    new NoteList("J", noteDuration * 65),
+				    new NoteList("K", noteDuration * 67),
+				    new NoteList("S", noteDuration * 69),
+				    new NoteList("L", noteDuration * 71),
+				    new NoteList("K", noteDuration * 73),
+				    new NoteList("S", noteDuration * 75),
+				    new NoteList("F", noteDuration * 77),
+				    new NoteList("D", noteDuration * 79),
+				    new NoteList("S", noteDuration * 81),
+				    new NoteList("J", noteDuration * 83),
+				    new NoteList("D", noteDuration * 85),
+				    new NoteList("F", noteDuration * 87),
+				    new NoteList("J", noteDuration * 89),
+				    new NoteList("L", noteDuration * 91)
 				};
 		}else if(Music.music.getTitle().equals("ETA")) {
+			Main.NOTE_SPEED = 8;  //노트 스피드 설정
 			int bpm = 135; // 노래의 BPM
 			double beatDuration = 60.0 / bpm; // 1 비트당 시간 (초 단위)
 			int noteDuration = (int) (beatDuration * 1000); // 1 비트당 시간 (밀리초 단위)
 			notelist = new NoteList[]{  //노트 리스트에서 노트 찍기
-					new NoteList("F", noteDuration*1)
+					new NoteList("F", 0),
+					new NoteList("S", noteDuration),
+				    new NoteList("S", noteDuration * 2),
+				    new NoteList("S", noteDuration * 2 + noteDuration/2),
+				    new NoteList("D", noteDuration * 3),
+				    new NoteList("J", noteDuration * 3 + noteDuration/2),
+				    new NoteList("K", noteDuration * 4),
+				    new NoteList("L", noteDuration * 4 + noteDuration/2),
+				    new NoteList("K", noteDuration * 5),
+				    new NoteList("D", noteDuration * 6),
+				    new NoteList("S", noteDuration * 6 + noteDuration/2),
+				    new NoteList("F", noteDuration * 7),
+				    new NoteList("K", noteDuration * 8),
+				    new NoteList("L", noteDuration * 8 + noteDuration/2),
+				    new NoteList("K", noteDuration * 9),
+				    new NoteList("S", noteDuration * 10),
+				    new NoteList("D", noteDuration * 10 + noteDuration/2),
+				    new NoteList("F", noteDuration * 11),
+				    new NoteList("J", noteDuration * 12),
+				    new NoteList("J", noteDuration * 13),
+				    new NoteList("L", noteDuration * 13 + noteDuration/2),
+				    new NoteList("S", noteDuration * 14),
+				    new NoteList("F", noteDuration * 15),
+				    new NoteList("D", noteDuration * 16),
+				    new NoteList("K", noteDuration * 17),
+				    new NoteList("L", noteDuration * 17 + noteDuration/2),
+				    new NoteList("K", noteDuration * 18),
+				    new NoteList("K", noteDuration * 19),
+				    new NoteList("F", noteDuration * 19 + noteDuration/2),
+				    new NoteList("S", noteDuration * 20),
+				    new NoteList("D", noteDuration * 21),
+				    new NoteList("J", noteDuration * 22),
+				    new NoteList("L", noteDuration * 22 + noteDuration/2),
+				    new NoteList("K", noteDuration * 23),
+				    new NoteList("L", noteDuration * 24),
+				    new NoteList("S", noteDuration * 25 + noteDuration/2),
+				    new NoteList("L", noteDuration * 26),
+				    new NoteList("F", noteDuration * 27),
+				    new NoteList("J", noteDuration * 28),
+				    new NoteList("S", noteDuration * 29),
+				    new NoteList("K", noteDuration * 30),
+				    new NoteList("J", noteDuration * 31),
+				    new NoteList("F", noteDuration * 32),
+				    new NoteList("J", noteDuration * 32 + noteDuration/2),
+				    new NoteList("L", noteDuration * 33),
+				    new NoteList("D", noteDuration * 34),
+				    new NoteList("F", noteDuration * 35),
+				    new NoteList("D", noteDuration * 36),
+				    new NoteList("S", noteDuration * 37),
+				    new NoteList("L", noteDuration * 37 + noteDuration/2),
+				    new NoteList("K", noteDuration * 38),
+				    new NoteList("S", noteDuration * 39),
+				    new NoteList("F", noteDuration * 40),
+				    new NoteList("D", noteDuration * 41),
+				    new NoteList("J", noteDuration * 42),
+				    new NoteList("K", noteDuration * 43),
+				    new NoteList("L", noteDuration * 43 + noteDuration/2),
+				    new NoteList("L", noteDuration * 44),
+				    new NoteList("K", noteDuration * 45),
+				    new NoteList("J", noteDuration * 46),
+				    new NoteList("D", noteDuration * 47),
+				    new NoteList("F", noteDuration * 47 + noteDuration/2),
+				    new NoteList("J", noteDuration * 48),
+				    new NoteList("L", noteDuration * 49),
+				    new NoteList("K", noteDuration * 49 + noteDuration/2),
+				    new NoteList("S", noteDuration * 50),
+				    new NoteList("D", noteDuration * 51),
+				    new NoteList("F", noteDuration * 52),
+				    new NoteList("F", noteDuration * 52 + noteDuration/2),
+				    new NoteList("S", noteDuration * 53),
+				    new NoteList("D", noteDuration * 54),
+				    new NoteList("S", noteDuration * 55 + noteDuration/2),
+				    new NoteList("L", noteDuration * 56),
+				    new NoteList("J", noteDuration * 57),
+				    new NoteList("K", noteDuration * 58),
+				    new NoteList("L", noteDuration * 59),
+				    new NoteList("S", noteDuration * 60),
+				    new NoteList("J", noteDuration * 61),
+				    new NoteList("K", noteDuration * 62),
+				    new NoteList("J", noteDuration * 62 + noteDuration/2),
+				    new NoteList("L", noteDuration * 63),
+				    new NoteList("F", noteDuration * 64),
+				    new NoteList("S", noteDuration * 65),
+				    new NoteList("F", noteDuration * 66),
+				    new NoteList("D", noteDuration * 67),
+				    new NoteList("L", noteDuration * 67 + noteDuration/2),
+				    new NoteList("K", noteDuration * 68),
+				    new NoteList("J", noteDuration * 69),
+				    new NoteList("D", noteDuration * 70),
+				    new NoteList("S", noteDuration * 71),
+				    new NoteList("K", noteDuration * 72),
+				    new NoteList("K", noteDuration * 73),
+				    new NoteList("J", noteDuration * 73 + noteDuration/2),
+				    new NoteList("S", noteDuration * 74),
+				    new NoteList("F", noteDuration * 75),
+				    new NoteList("D", noteDuration * 76),
+				    new NoteList("K", noteDuration * 77),
+				    new NoteList("L", noteDuration * 77 + noteDuration/2),
+				    new NoteList("J", noteDuration * 78),
+				    new NoteList("S", noteDuration * 79),
+				    new NoteList("F", noteDuration * 79 + noteDuration/2),
+				    new NoteList("D", noteDuration * 80),
+				    new NoteList("S", noteDuration * 81),
+				    new NoteList("D", noteDuration * 82),
+				    new NoteList("F", noteDuration * 82 + noteDuration/2),
+				    new NoteList("J", noteDuration * 83),
+				    new NoteList("K", noteDuration * 84),
+				    new NoteList("D", noteDuration * 85 + noteDuration/2),
+				    new NoteList("L", noteDuration * 86),
+				    new NoteList("J", noteDuration * 87),
+				    new NoteList("K", noteDuration * 88),
+				    new NoteList("D", noteDuration * 89),
+				    new NoteList("J", noteDuration * 90),
+				    new NoteList("L", noteDuration * 91),
+				    new NoteList("S", noteDuration * 92),
+				    new NoteList("F", noteDuration * 92 + noteDuration/2),
+				    new NoteList("K", noteDuration * 93),
+				    new NoteList("D", noteDuration * 94),
+				    new NoteList("F", noteDuration * 95),
+				    new NoteList("J", noteDuration * 96),
+				    new NoteList("L", noteDuration * 97),
+				    new NoteList("J", noteDuration * 97 + noteDuration/2),
+				    new NoteList("K", noteDuration * 98),
+				    new NoteList("L", noteDuration * 99),
+				    new NoteList("D", noteDuration * 100),
+				    new NoteList("D", noteDuration * 101),
+				    new NoteList("L", noteDuration * 102),
+				    new NoteList("J", noteDuration * 103),
+				    new NoteList("L", noteDuration * 103 + noteDuration/2),
+				    new NoteList("S", noteDuration * 104),
+				    new NoteList("F", noteDuration * 105),
+				    new NoteList("D", noteDuration * 106),
+				    new NoteList("K", noteDuration * 107),
+				    new NoteList("L", noteDuration * 107 + noteDuration/2),
+				    new NoteList("K", noteDuration * 108),
+				    new NoteList("L", noteDuration * 109),
+				    new NoteList("S", noteDuration * 109 + noteDuration/2),
+				    new NoteList("F", noteDuration * 110),
+				    new NoteList("D", noteDuration * 111),
+				    new NoteList("J", noteDuration * 112),
+				    new NoteList("S", noteDuration * 112 + noteDuration/2),
+				    new NoteList("K", noteDuration * 113),
+				    new NoteList("L", noteDuration * 114),
+				    new NoteList("S", noteDuration * 115 + noteDuration/2),
+				    new NoteList("S", noteDuration * 116),
+				    new NoteList("D", noteDuration * 117),
+				    new NoteList("L", noteDuration * 118),
+				    new NoteList("K", noteDuration * 119),
+				    new NoteList("J", noteDuration * 120),
+				    new NoteList("J", noteDuration * 121),
+				    new NoteList("K", noteDuration * 122),
+				    new NoteList("S", noteDuration * 122 + noteDuration/2),
+				    new NoteList("D", noteDuration * 123),
+				    new NoteList("F", noteDuration * 124),
+				    new NoteList("F", noteDuration * 125),
+				    new NoteList("D", noteDuration * 126),
+				    new NoteList("S", noteDuration * 127),
+				    new NoteList("S", noteDuration * 127 + noteDuration/2),
+				    new NoteList("L", noteDuration * 128),
+				    new NoteList("D", noteDuration * 129),
+				    new NoteList("K", noteDuration * 130),
+				    new NoteList("F", noteDuration * 131),
+				    new NoteList("J", noteDuration * 132),
+				    new NoteList("D", noteDuration * 133),
+				    new NoteList("J", noteDuration * 133 + noteDuration/2),
+				    new NoteList("S", noteDuration * 134),
+				    new NoteList("K", noteDuration * 135),
+				    new NoteList("D", noteDuration * 136),
+				    new NoteList("F", noteDuration * 137),
+				    new NoteList("L", noteDuration * 137 + noteDuration/2),
+				    new NoteList("K", noteDuration * 138),
+				    new NoteList("S", noteDuration * 138 + noteDuration/2),
+				    new NoteList("F", noteDuration * 139),
+				    new NoteList("D", noteDuration * 140),
+				    new NoteList("J", noteDuration * 141),
+				    new NoteList("K", noteDuration * 142),
+				    new NoteList("L", noteDuration * 143),
+				    new NoteList("S", noteDuration * 144),
+				    new NoteList("F", noteDuration * 144 + noteDuration/2),
+				    new NoteList("D", noteDuration * 145),
+				    new NoteList("J", noteDuration * 146),
+				    new NoteList("L", noteDuration * 147),
+				    new NoteList("D", noteDuration * 148),
+				    new NoteList("J", noteDuration * 149),
+				    new NoteList("L", noteDuration * 149 + noteDuration/2),
+				    new NoteList("D", noteDuration * 150),
+				    new NoteList("F", noteDuration * 151),
+				    new NoteList("K", noteDuration * 151 + noteDuration/2),
+				    new NoteList("L", noteDuration * 152),
+				    new NoteList("J", noteDuration * 153),
+				    new NoteList("S", noteDuration * 154),
+				    new NoteList("J", noteDuration * 155),
+				    new NoteList("L", noteDuration * 155 + noteDuration/2),
+				    new NoteList("S", noteDuration * 156),
+				    new NoteList("D", noteDuration * 157),
+				    new NoteList("F", noteDuration * 158),
+				    new NoteList("K", noteDuration * 159),
+				    new NoteList("L", noteDuration * 160),
+				    new NoteList("S", noteDuration * 161),
+				    new NoteList("F", noteDuration * 161 + noteDuration/2),
+				    new NoteList("D", noteDuration * 162),
+				    new NoteList("J", noteDuration * 163),
+				    new NoteList("L", noteDuration * 163 + noteDuration/2),
+				    new NoteList("D", noteDuration * 164),
+				    new NoteList("K", noteDuration * 165),
+				    new NoteList("J", noteDuration * 166),
+				    new NoteList("K", noteDuration * 166 + noteDuration/2),
+				    new NoteList("J", noteDuration * 167),
+				    new NoteList("S", noteDuration * 168),
+				    new NoteList("F", noteDuration * 169),
+				    new NoteList("S", noteDuration * 170),
+				    new NoteList("D", noteDuration * 170 + noteDuration/2),
+				    new NoteList("L", noteDuration * 171),
+				    new NoteList("S", noteDuration * 172),
+				    new NoteList("F", noteDuration * 174),
+				    new NoteList("K", noteDuration * 175 + noteDuration/2),
+				    new NoteList("S", noteDuration * 178),
+				    new NoteList("D", noteDuration * 180),
+				    new NoteList("F", noteDuration * 183),
+				    new NoteList("J", noteDuration * 185),
+				    new NoteList("K", noteDuration * 187),
+				    new NoteList("L", noteDuration * 189),
+				    new NoteList("S", noteDuration * 192),
+				    new NoteList("F", noteDuration * 195),
+				    new NoteList("K", noteDuration * 197),
+				    new NoteList("D", noteDuration * 199),
+				    new NoteList("F", noteDuration * 200),
+				    new NoteList("L", noteDuration * 200 + noteDuration/2)
 			};  //test
 		}
 		for (NoteList item : notelist) {
@@ -301,7 +513,7 @@ public class Game extends Thread{
 		        }
 		        
 		        noteArrayList.remove(i);  //노트 arrayList에서 삭제
-		        judgmentTimer.restart();
+		        judgementTimer.restart();
 		        
 		        if(combo>bestCombo) bestCombo = combo;  //최고 콤보 수 업데이트
 		        
@@ -318,7 +530,7 @@ public class Game extends Thread{
 	        if (note.getY() >= missY) {  //미스 라인을 지나면
 	        	noteArrayList.remove(i);
 	        	bad = new ImageIcon(imagePath+"Bad.png").getImage();  //배드 효과
-	        	judgmentTimer.restart();
+	        	judgementTimer.restart();
 	            countBad++;  //배드 수 증가
 	            combo = 0; //콤보 수 초기화
 	            i--; // 노트를 제거했으므로 인덱스를 하나 줄임
@@ -330,10 +542,17 @@ public class Game extends Thread{
 	//점수 화면으로 이동하는 메서드
 	public void goScoreScreen() {
 		if(noteArrayList.isEmpty()) {  //게임이 끝나면 점수 화면으로 이동
-			Main.screen.isGame = false;  //이제 게임 아님
-			mp3.stop();  //test
-			Main.screen.generateScore(countPerfect,countGood,countBad,bestCombo,score);  //점수 화면 생성
-			Main.screen.scorePanel.setVisible(true);  //점수 화면 패널 보이게
+			Timer timer = new Timer(4000, new ActionListener() {
+		        @Override
+		        public void actionPerformed(ActionEvent e) {
+		        	Main.screen.isGame = false;  //이제 게임 아님
+					mp3.stop();  //test
+					Main.screen.generateScore(countPerfect,countGood,countBad,bestCombo,score);  //점수 화면 생성
+					Main.screen.scorePanel.setVisible(true);  //점수 화면 패널 보이게
+		        }
+			});
+			timer.restart();
+			timer.setRepeats(false);
 		}
 	}
 	//Pressed
@@ -360,6 +579,17 @@ public class Game extends Thread{
 	public void pressed_L() {
 		EffectBar_L = new ImageIcon(imagePath+"EffectBar_L.png").getImage();
 		Judge("L");
+	}
+	public void pressed_ESC() {
+		mp3.stop();  //노래 정지
+		try {
+			Thread.sleep(700);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+        Main.screen.isGame = false;  //이제 게임 아님
+        Main.screen.generateSelectSong();  //노래 고르는 화면 생성
+        Main.screen.selectSongPanel.setVisible(true);  //노래 고르는 화면 보이게
 	}
 	
 	//Released
