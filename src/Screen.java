@@ -512,6 +512,7 @@ public class Screen extends JFrame{
 	//노래 선택 패널 만드는 메서드
 	public void generateSelectSong() {
 		String musicPath = System.getProperty("user.dir")+"/src/musics/";  //음악 상대 경로
+		MP3Player effect = new MP3Player();  //효과음
 		
 		ImageIcon selectSongImg = new ImageIcon(imagePath + "SelectSong_Screen.png");  //노래 선택 화면 이미지
 		ImageIcon clickRightButtonImg = new ImageIcon(imagePath + "Click_Right_Button.png");  //오른쪽 버튼 클릭 이미지
@@ -580,6 +581,12 @@ public class Screen extends JFrame{
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				if(highlightPlayer.isPlaying()) {  //이전 노래가 재생중이라면
+					highlightPlayer.stop();  //노래 정지
+				}
+				
+				effect.play(musicPath+"Paper_Effect.mp3");  //종이 넘기는 효과음 재생
+				
 				if(e.getActionCommand().equals("오른쪽")) {
 					if(musicIndex<musicList.size()-1)  //노래 리스트 길이보다 작다면 인덱스 증가
 						musicIndex++;
@@ -592,9 +599,6 @@ public class Screen extends JFrame{
 				singerLabel.setText(musicList.get(musicIndex).getSinger());  //노래 가수 교체
 				albumLabel.setIcon(albumChangeImg);  //앨범 커버 이미지 교체
 
-				if(highlightPlayer.isPlaying()) {  //이전 노래가 재생중이라면
-					highlightPlayer.stop();  //노래 정지
-				}
 				
 				//노래 끊기는 게 어색해서 넣음
 				try {
