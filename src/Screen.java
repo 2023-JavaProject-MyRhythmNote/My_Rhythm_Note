@@ -861,7 +861,7 @@ public class Screen extends JFrame{
 				if(result.getInt("score")<=score)  //점수가 높으면 break
 					break;
 				else if(result.getString("user").equals(user.getNickName()))   //본인 원래 순위 제외
-					continue;
+					ranking++;  //순위 증가
 				else
 					ranking++;  //순위 증가
 		    }
