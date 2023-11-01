@@ -236,10 +236,7 @@ public class Game extends Thread{
 				    new NoteList("D", noteDuration * 85),
 				    new NoteList("F", noteDuration * 87),
 				    new NoteList("J", noteDuration * 89),
-				    new NoteList("L", noteDuration * 91),
-				    new NoteList("K", noteDuration * 93),
-				    new NoteList("F", noteDuration * 95),
-				    new NoteList("L", noteDuration * 97)
+				    new NoteList("L", noteDuration * 91)
 				};
 		}else if(Music.music.getTitle().equals("ETA")) {
 			Main.NOTE_SPEED = 8;  //노트 스피드 설정
