@@ -30,6 +30,10 @@ import javazoom.jl.player.Player;
 			if(e.getKeyChar() == 'l') {
 				Screen.game.pressed_L();
 			}
+			//esc 눌렀을 때 게임 종료
+	        if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+	        	Screen.game.pressed_ESC();
+	        }
 		}
 		//눌렀던 키보드를 뗐을때
 		public void keyReleased(KeyEvent e) {

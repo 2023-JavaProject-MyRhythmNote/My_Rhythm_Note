@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
@@ -581,6 +582,17 @@ public class Game extends Thread{
 	public void pressed_L() {
 		EffectBar_L = new ImageIcon(imagePath+"EffectBar_L.png").getImage();
 		Judge("L");
+	}
+	public void pressed_ESC() {
+		mp3.stop();  //노래 정지
+		try {
+			Thread.sleep(700);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+        Main.screen.isGame = false;  //이제 게임 아님
+        Main.screen.generateSelectSong();  //노래 고르는 화면 생성
+        Main.screen.selectSongPanel.setVisible(true);  //노래 고르는 화면 보이게
 	}
 	
 	//Released
