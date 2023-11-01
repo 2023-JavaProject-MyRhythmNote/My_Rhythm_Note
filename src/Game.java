@@ -59,7 +59,7 @@ public class Game extends Thread{
 	
 	public Game() {
 	    //3초 대기
-	    Timer startGameTimer = new Timer(3000, new ActionListener() {
+	    Timer startGameTimer = new Timer(1100, new ActionListener() {
 	        @Override
 	        public void actionPerformed(ActionEvent e) {
 	            mp3.play(musicPath + Music.music.getTitle() + ".mp3");  //노래 시작
