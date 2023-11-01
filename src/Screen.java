@@ -30,7 +30,9 @@ public class Screen extends JFrame{
 	private final int FRAME_HEIGHT = 900;  //세로 크기
 	int musicIndex = 0;  //노래 인덱스
 	
+	String musicPath = System.getProperty("user.dir")+"/src/musics/";  //음악 상대 경로
 	String imagePath = System.getProperty("user.dir")+"/src/images/";  //이미지 상대 경로
+	
 	ImageIcon startImg = new ImageIcon(imagePath + "Start_Screen.png"); //시작화면 이미지
 	ImageIcon clickButtonImg = new ImageIcon(imagePath + "Click_Button.png");  //버튼 클릭 이미지
 	
@@ -511,7 +513,6 @@ public class Screen extends JFrame{
 	
 	//노래 선택 패널 만드는 메서드
 	public void generateSelectSong() {
-		String musicPath = System.getProperty("user.dir")+"/src/musics/";  //음악 상대 경로
 		MP3Player effect = new MP3Player();  //효과음
 		
 		ImageIcon selectSongImg = new ImageIcon(imagePath + "SelectSong_Screen.png");  //노래 선택 화면 이미지
@@ -796,6 +797,10 @@ public class Screen extends JFrame{
 	
 	//점수 패널 만드는 메서드           퍼펙트           굿          배드      콤보 수        점수 
 	public void generateScore(int perfect, int good, int bad, int combo, int score) {
+		MP3Player effect = new MP3Player();  //효과음
+		
+		effect.play(musicPath + "Paper_Effect.mp3");  //종이 넘기는 효과음 재생
+		
 		ImageIcon albumImg = new ImageIcon(imagePath +musicList.get(musicIndex).getTitle()+"_Ranking.png");  //해당 노래 앨범 이미지
 		ImageIcon clickRankingButtonImg = new ImageIcon(imagePath + "Click_Ranking_Button.png");  //돌아가기 버튼 클릭 이미지
 
