@@ -68,9 +68,9 @@ public class Screen extends JFrame{
 	MP3Player highlightPlayer = new MP3Player();  //노래 하이라이트 재생용 MP3Player
 	
 	public Screen() {
-		musicList.add(new Music("NewJeans","ETA"));  //ETA 추가 
 		musicList.add(new Music("imase","NIGHT DANCER"));  //NIGHT DANCER 추가
 		musicList.add(new Music("정국","3D"));  //3D 추가
+		musicList.add(new Music("NewJeans","ETA"));  //ETA 추가 
 		/*set*/
 		startPanel.setLayout(null);   //시작화면
 		setFocusable(true);
@@ -623,7 +623,6 @@ public class Screen extends JFrame{
 			selectSongPanel.setVisible(false);  //노래 선택 화면 숨김
 			isGame = true;  //게임이다.
 			game = new Game();
-//			game.mp3.play(musicPath+musicList.get(musicIndex).getTitle()+".mp3");  //노래 재생 시작
 			setLocation(1000, 1000);  //윈도우 창 멀리 보내버림
 			setLocationRelativeTo(null);  //윈도우 창 다시 정중앙에
 		});

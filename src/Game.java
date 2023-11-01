@@ -57,6 +57,16 @@ public class Game extends Thread{
 	Image bad;
 	
 	public Game() {
+	    //3초 대기
+	    Timer startGameTimer = new Timer(3000, new ActionListener() {
+	        @Override
+	        public void actionPerformed(ActionEvent e) {
+	            mp3.play(musicPath + Music.music.getTitle() + ".mp3");  //노래 시작
+	            start();  //시작
+	        }
+	    });
+	    startGameTimer.setRepeats(false); // 타이머가 한 번만 실행되도록 설정
+	    startGameTimer.restart(); // 타이머 시작
 		//노트 판정 효과 나오는 시간 조절
 	    judgementTimer = new Timer(70, new ActionListener() {
 	        @Override
