@@ -2,12 +2,14 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
 import javazoom.jl.player.MP3Player;
+import javazoom.jl.player.Player;
 
 	public class NoteKeyListener extends KeyAdapter{
 		MP3Player key_mp3 = new MP3Player();  //test
+		
 		@Override  //키보드 눌렀을때 
 		public void keyPressed(KeyEvent e) {
-			
+			key_mp3.play(System.getProperty("user.dir")+"/src/musics/Key_Effect.mp3");  //키보드 효과음
 			if(Screen.game == null) return;
 			
 			if(e.getKeyChar() == 's') {
@@ -28,7 +30,6 @@ import javazoom.jl.player.MP3Player;
 			if(e.getKeyChar() == 'l') {
 				Screen.game.pressed_L();
 			}
-			key_mp3.play(System.getProperty("user.dir")+"/src/musics/Key_Effect.mp3");  //키보드 효과음
 		}
 		//눌렀던 키보드를 뗐을때
 		public void keyReleased(KeyEvent e) {

@@ -8,6 +8,7 @@ public class Music extends Thread{
 		this.singer = singer;
 		this.title = title;
 	}
+	
 	//Getter Setter
 	public String getSinger() {
 		return singer;
