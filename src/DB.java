@@ -15,7 +15,7 @@ class DB{
 			conn = DriverManager.getConnection(url,id, password);
 			stmt = conn.createStatement();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 		}
 	}
 	
@@ -24,7 +24,7 @@ class DB{
             try {
                 conn.close();
             } catch (SQLException e) {
-                e.printStackTrace();
+            	System.out.println(e.getMessage());
             }
         }
     }

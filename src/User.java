@@ -3,14 +3,6 @@ public class User {
 	private String nickName;  //닉네임
 	public String password;  //비밀번호
 	
-	//생성자
-	public User(String nickName, String password) {
-		this.nickName = nickName;
-		this.password = password;
-	}
-	public User() {
-		
-	}
 	//getter setter
 	public String getNickName() {
 		return nickName;

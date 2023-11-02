@@ -66,13 +66,16 @@ public class Screen extends JFrame{
 	Font buttonFont = new Font("TDTDTadakTadak",Font.PLAIN,80);   //버튼 폰트
 	
 	User user = new User();  //유저
+	
 	ArrayList<Music> musicList = new ArrayList<Music>();  //노래 리스트
+	
 	MP3Player highlightPlayer = new MP3Player();  //노래 하이라이트 재생용 MP3Player
 	
-	public Screen() {
+	public Screen() {  //생성자
 		musicList.add(new Music("imase","NIGHT DANCER"));  //NIGHT DANCER 추가
 		musicList.add(new Music("정국","3D"));  //3D 추가
 		musicList.add(new Music("NewJeans","ETA"));  //ETA 추가 
+		
 		/*set*/
 		startPanel.setLayout(null);   //시작화면
 		setFocusable(true);
@@ -159,7 +162,6 @@ public class Screen extends JFrame{
 		g.dispose();
 	}
 	
-	
 	void screenDraw(Graphics2D g){  //화면 그리는 메서드
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);  //안티 앨리어싱 설정(화질 좋아지게)
 		if(isGame) {  //지금 게임 실행이면?
@@ -226,9 +228,9 @@ public class Screen extends JFrame{
 		//뒤로가기 버튼
 		backButton.setFont(buttonFont);
 		backButton.setBounds(30,0,320,75);
+		backButton.setHorizontalTextPosition(JButton.CENTER);
 		backButton.setRolloverIcon(new ImageIcon(imagePath + "Click_Ranking_Button.png"));  //호버링시 이미지 변경
 		transparencyButton(backButton);  //버튼 투명하게
-		backButton.setHorizontalTextPosition(JButton.CENTER);
 		
 		/*add*/
 		signInPanel.add(noPasswordLabel);  //불일치 안내 라벨
@@ -250,7 +252,7 @@ public class Screen extends JFrame{
 		
 		signInPanel.add(backButton);  //뒤로가기 버튼
 		signInPanel.add(OKButton);  //확인 버튼
-		signInPanel.add(signInScreenLabel);
+		signInPanel.add(signInScreenLabel);  //로그인 화면 라벨
 		add(signInPanel);
 		signInPanel.setVisible(false);
 	}
@@ -280,8 +282,9 @@ public class Screen extends JFrame{
 				noPasswordLabel.setVisible(true);  // 불일치 안내
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 		}
+		
 		db.closeConnection();  //db 연결 해제
 		
 		if(signInSuccess) {
@@ -342,10 +345,9 @@ public class Screen extends JFrame{
 		//뒤로가기 버튼
 		backButton.setFont(buttonFont);
 		backButton.setBounds(30,0,320,75);
+		backButton.setHorizontalTextPosition(JButton.CENTER);
 		backButton.setRolloverIcon(new ImageIcon(imagePath + "Click_Ranking_Button.png"));  //호버링시 이미지 변경
 		transparencyButton(backButton);  //버튼 투명하게
-		backButton.setHorizontalTextPosition(JButton.CENTER);
-		
 		//중복 닉네임 안내 라벨
 		overlapNicknameLabel.setFont(guideFont);
 		overlapNicknameLabel.setBounds(200, 610, 1000, 100);
@@ -399,15 +401,15 @@ public class Screen extends JFrame{
 		try {
 			checkResult = db.stmt.executeQuery(sql);
 			if(checkResult.next()) {  //중복 닉네임이 있다면
-				checkPasswordLabel.setVisible(false);
+				checkPasswordLabel.setVisible(false);  //비번 불일치 안내 라벨 숨김
 				overlapNicknameLabel.setVisible(true);  //중복 닉네임 안내
 				isOverlap = true;  //중복임
 			}else {  //중복되는 닉네임이 없다면
-				overlapNicknameLabel.setVisible(false);  //중복 닉네임 안내 숨김
+				overlapNicknameLabel.setVisible(false);  //중복 닉네임 안내 라벨 숨김
 				isOverlap = false;  //중복아님
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 		}
 		
 		//비번과 확인용 비번이 불일치인지 확인
@@ -458,7 +460,7 @@ public class Screen extends JFrame{
 		/*set*/
 		gameRulePanel.setLayout(null);
 		gameRuleScreenLabel.setBounds(0, 0, FRAME_WIDTH, FRAME_HEIGHT);  //게임방법 화면 라벨
-		//게임방법! 텍스트 라벨
+		//게임방법 텍스트 라벨
 		gameRuleText.setFont(font);
 		gameRuleText.setBounds(0, -360, FRAME_WIDTH, FRAME_HEIGHT);
 		gameRuleText.setHorizontalAlignment(JLabel.CENTER);
@@ -554,28 +556,28 @@ public class Screen extends JFrame{
 		screenNameLabel.setFont(font);  //폰트 설정
 		//오른쪽 버튼
 		rightButton.setBounds(1050, 400, 270, 130);
-		transparencyButton(rightButton);  //버튼 투명하게
 		rightButton.setRolloverIcon(clickRightButtonImg);  //호버링시 이미지 변경
 		rightButton.setActionCommand("오른쪽");
+		transparencyButton(rightButton);  //버튼 투명하게
 		//왼쪽 버튼
 		leftButton.setBounds(100, 400, 270, 130);
-		transparencyButton(leftButton);  //버튼 투명하게
 		leftButton.setRolloverIcon(clickLeftButtonImg);  //호버링시 이미지 변경
 		leftButton.setActionCommand("왼쪽");
+		transparencyButton(leftButton);  //버튼 투명하게
 		//앨범 커버
 		albumLabel.setBounds(0, 0, FRAME_WIDTH, FRAME_HEIGHT);  //앨범 커버 라벨
 		//선택 버튼
 		selectButton.setBounds(540,700,320,100);
-		transparencyButton(selectButton);  //버튼 투명하게
 		selectButton.setFont(buttonFont);  //폰트 설정
 		selectButton.setHorizontalTextPosition(JButton.CENTER);
 		selectButton.setRolloverIcon(clickButtonImg);  //호버링시 이미지 변경
+		transparencyButton(selectButton);  //버튼 투명하게
 		//랭킹보기 버튼
 		rankingButton.setBounds(1050,0,320,80);
-		transparencyButton(rankingButton);  //버튼 투명하게
 		rankingButton.setFont(buttonFont);  //폰트 설정
 		rankingButton.setHorizontalTextPosition(JButton.CENTER);
 		rankingButton.setRolloverIcon(clickRankingButtonImg);  //호버링시 이미지 변경
+		transparencyButton(rankingButton);  //버튼 투명하게
 		
 		//액션 리스너
 		ActionListener selelctbuttonListener = new ActionListener() {
@@ -605,7 +607,7 @@ public class Screen extends JFrame{
 				try {
 					Thread.sleep(350);
 				} catch (InterruptedException e1) {
-					e1.printStackTrace();
+					System.out.println(e1.getMessage());
 				}
 				highlightPlayer.play(musicPath+musicList.get(musicIndex).getTitle()+" highlight.mp3");  //하이라이트 재생
 			}
@@ -632,7 +634,7 @@ public class Screen extends JFrame{
 			}
 			selectSongPanel.setVisible(false);  //노래 선택 화면 숨김
 			isGame = true;  //게임이다.
-			game = new Game();
+			game = new Game();  //게임 생성
 			setLocation(1000, 1000);  //윈도우 창 멀리 보내버림
 			setLocationRelativeTo(null);  //윈도우 창 다시 정중앙에
 		});
@@ -876,11 +878,11 @@ public class Screen extends JFrame{
 					break;
 				else if(result.getString("user").equals(user.getNickName()))   //본인 원래 순위 제외
 					ranking++;  //순위 증가
-				else
+				else  //점수가 낮으면
 					ranking++;  //순위 증가
 		    }
 		} catch (SQLException e) {
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 		}
 		db.closeConnection();
 		
@@ -951,16 +953,16 @@ public class Screen extends JFrame{
 		userNameLabel.setBounds((FRAME_WIDTH/2)-(nameWidth/2), 10, nameWidth, 100);
 		//돌아가기 버튼
 		backButton.setBounds(1050,0,320,80);
-		transparencyButton(backButton);  //버튼 투명하게
 		backButton.setFont(buttonFont);  //폰트 설정
 		backButton.setHorizontalTextPosition(JButton.CENTER);
 		backButton.setRolloverIcon(clickRankingButtonImg);  //호버링시 이미지 변경
+		transparencyButton(backButton);  //버튼 투명하게
 		
 		/*add*/
 		backButton.addActionListener(e->{
 			scorePanel.setVisible(false);  //점수 화면 숨김
 			scorePanel.removeAll();  //점수 화면 패널 삭제
-			selectSongPanel.setVisible(true);
+			selectSongPanel.setVisible(true);  //노래 선택 패널 보이게
 		});
 		scorePanel.add(backButton);  //돌아가기 버튼
 		scorePanel.add(userRankingLabel);  //플레이어 순위 라벨

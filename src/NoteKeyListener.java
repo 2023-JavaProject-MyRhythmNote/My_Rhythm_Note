@@ -2,10 +2,9 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
 import javazoom.jl.player.MP3Player;
-import javazoom.jl.player.Player;
 
 	public class NoteKeyListener extends KeyAdapter{
-		MP3Player key_mp3 = new MP3Player();  //test
+		MP3Player key_mp3 = new MP3Player();
 		
 		@Override  //키보드 눌렀을때 
 		public void keyPressed(KeyEvent e) {
@@ -30,7 +29,7 @@ import javazoom.jl.player.Player;
 			if(e.getKeyChar() == 'l') {
 				Screen.game.pressed_L();
 			}
-			//esc 눌렀을 때 게임 종료
+			//ESC 키 눌렀을 때 게임 종료
 	        if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
 	        	Screen.game.pressed_ESC();
 	        }
