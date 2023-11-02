@@ -6,17 +6,19 @@ import javax.swing.ImageIcon;
 //노트가 내려오는 클래스
 public class Note extends Thread{
 	String imagePath = System.getProperty("user.dir")+"/src/images/";  //이미지 상대 경로
+	String noteType;  //노트의 타입
+	
 	Image noteImage = new ImageIcon(imagePath+"Note.png").getImage();  //노트 이미지
+	
 	int x;  //노트의 x 위치
 	int y = 100;  //노트의 y 위치
-	String noteType;  //노트의 타입
 	int startTime;  //노트가 나오는 시간
     
-	public Note(NoteList notelist) {
+	public Note(NoteList notelist) {  //생성자
 		this.noteType = notelist.getNoteType();
 		this.startTime = notelist.getStartTime();
 		
-		//노트의 타입으로 x좌표의 위치를 정함
+		//노트의 타입으로 x의 위치를 정함
 		if(noteType.equals("S")) {
 			this.x = 80; 
 		}
@@ -61,8 +63,7 @@ public class Note extends Thread{
 				Thread.sleep(Main.SLEEP_TIME); 
 			}//while
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 		}
-		//test
 	}
 }
