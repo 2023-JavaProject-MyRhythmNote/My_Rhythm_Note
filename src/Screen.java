@@ -16,6 +16,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 import javazoom.jl.player.MP3Player;
@@ -57,10 +58,10 @@ public class Screen extends JFrame{
 	JPanel scorePanel = new JPanel();  //점수 패널
 	
 	JTextField signInNicknameTF = new JTextField();  //로그인 닉네임 텍스트 필드
-	JTextField signInPasswordTF = new JTextField();  //로그인 비밀번호 텍스트 필드
+	JPasswordField signInPasswordTF = new JPasswordField();  //로그인 비밀번호 텍스트 필드
 	JTextField signUpNicknameTF = new JTextField();  //회원가입 닉네임 텍스트 필드
-	JTextField signUpPasswordTF = new JTextField();  //회원가입 비밀번호 텍스트 필드
-	JTextField signUpPasswordCheckTF = new JTextField();  //회원가입 비밀번호 확인 텍스트 필드
+	JPasswordField signUpPasswordTF = new JPasswordField();  //회원가입 비밀번호 텍스트 필드
+	JPasswordField signUpPasswordCheckTF = new JPasswordField();  //회원가입 비밀번호 확인 텍스트 필드
 	
 	Font font1 = new Font("TDTDTadakTadak",Font.PLAIN,250);   //로고 폰트
 	Font buttonFont = new Font("TDTDTadakTadak",Font.PLAIN,80);   //버튼 폰트
@@ -213,7 +214,7 @@ public class Screen extends JFrame{
 		signInNicknameTF.setFont(textFont);
 		signInNicknameTF.setBounds(600, 355, 300, 80);
 		//비밀번호 텍스트 필드
-		signInPasswordTF.setFont(textFont);
+		signInPasswordTF.setFont(new Font("Arial",Font.PLAIN,60));
 		signInPasswordTF.setBounds(600, 515, 300, 80);
 		//확인버튼
 		OKButton.setFont(buttonFont);
@@ -264,7 +265,7 @@ public class Screen extends JFrame{
 		boolean signInSuccess = false;  //로그인 성공했는지
 		
 		user.setNickName(signInNicknameTF.getText());  //닉네임 설정
-		user.setPassword(signInPasswordTF.getText());  //비번 설정
+		user.setPassword(String.valueOf(signInPasswordTF.getPassword()));  //비번 설정
 		
 		String sql = "SELECT * FROM user WHERE nickname = '" + user.getNickName() + "'";  //닉네임이 있는지 확인용 sql문
 		ResultSet result;
@@ -331,10 +332,10 @@ public class Screen extends JFrame{
 		signUpNicknameTF.setFont(textFont);
 		signUpNicknameTF.setBounds(700, 260, 300, 80);
 		//비밀번호 텍스트 필드
-		signUpPasswordTF.setFont(textFont);
+		signUpPasswordTF.setFont(new Font("Arial",Font.PLAIN,60));
 		signUpPasswordTF.setBounds(700, 405, 300, 80);
 		//비밀번호 확인 텍스트 필드
-		signUpPasswordCheckTF.setFont(textFont);
+		signUpPasswordCheckTF.setFont(new Font("Arial",Font.PLAIN,60));
 		signUpPasswordCheckTF.setBounds(700, 550, 300, 80);
 		//확인버튼
 		OKButton.setFont(buttonFont);
@@ -392,7 +393,7 @@ public class Screen extends JFrame{
 		boolean signUpSuccess = false;  //회원가입 성공했는지
 		
 		user.setNickName(signUpNicknameTF.getText()); // 닉네임 설정
-		user.setPassword(signUpPasswordTF.getText()); // 비번 설정
+		user.setPassword(String.valueOf(signUpPasswordTF.getPassword())); // 비번 설정
 		
 		//중복 닉네임인지 확인 
 		String sql = "SELECT * FROM user WHERE nickname = '"+user.getNickName()+"'";// 닉네임이 있는지 확인용 sql문
@@ -413,21 +414,20 @@ public class Screen extends JFrame{
 		}
 		
 		//비번과 확인용 비번이 불일치인지 확인
-		if(!signUpPasswordTF.getText().equals(signUpPasswordCheckTF.getText()) && !isOverlap) {  //비번과 확인용 비번이 불일치라면 & 닉네임이 중복이 아니라면
-			checkPasswordLabel.setVisible(true);   //중복 닉네임 안내
+		if(!user.getPassword().equals(String.valueOf(signUpPasswordCheckTF.getPassword())) && !isOverlap) {  //비번과 확인용 비번이 불일치라면 & 닉네임이 중복이 아니라면
+			checkPasswordLabel.setVisible(true);   //비번 불일치 안내
 		}else {  //일치하면
-			checkPasswordLabel.setVisible(false);  //중복 닉네임 안내 숨김
+			checkPasswordLabel.setVisible(false);  //비번 불일치 안내 숨김
+			//계정 정보 DB에 넣기
+			sql = "INSERT INTO user (nickname, password) VALUES ('"+user.getNickName()+"', '"+user.getPassword()+"')";  //데이터 넣는 sql문
+			try {
+				db.stmt.executeUpdate(sql);
+				signUpSuccess = true;  //회원가입 성공
+			} catch (SQLException e) {
+				System.out.println(e.getMessage());
+			}
+			db.closeConnection(); // db 연결 해제
 		}
-		
-		//계정 정보 DB에 넣기
-		sql = "INSERT INTO user (nickname, password) VALUES ('"+user.getNickName()+"', '"+user.getPassword()+"')";  //데이터 넣는 sql문
-		try {
-			db.stmt.executeUpdate(sql);
-			signUpSuccess = true;  //회원가입 성공
-		} catch (SQLException e) {
-			System.out.println(e.getMessage());
-		}
-		db.closeConnection(); // db 연결 해제
 		
 		if(signUpSuccess) {  //회원가입 성공시
 			signUpPanel.setVisible(false);  //회원가입 화면 숨김

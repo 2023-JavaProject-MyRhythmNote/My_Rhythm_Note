@@ -410,12 +410,12 @@ public class Game extends Thread{
 		        @Override
 		        public void actionPerformed(ActionEvent e) {
 		        	Screen.game = null;
+		        	Main.screen.generateScore(countPerfect,countGood,countBad,bestCombo,score);  //점수 화면 생성
 		        	Main.screen.isGame = false;  //이제 게임 아님
-					Main.screen.generateScore(countPerfect,countGood,countBad,bestCombo,score);  //점수 화면 생성
 					Main.screen.scorePanel.setVisible(true);  //점수 화면 패널 보이게
 		        }
 			});
-			timer.restart();
+			timer.start();
 			timer.setRepeats(false);  // 타이머가 한 번만 실행되도록 설정
 		}
 	}
